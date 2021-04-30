@@ -1,0 +1,1966 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 2
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L mntcomp-keyboard:Choc SW1
+U 1 1 594D7DFA
+P 3550 3300
+F 0 "SW1" H 3841 3421 50  0000 L CNN
+F 1 "Choc" H 3841 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 3550 3300 50  0001 C CNN
+F 3 "" H 3550 3300 50  0000 C CNN
+F 4 "Kailh" H 3550 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 3550 3300 50  0001 C CNN "Manufacturer_No"
+	1    3550 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW2
+U 1 1 594D7E8E
+P 4400 3300
+F 0 "SW2" H 4691 3421 50  0000 L CNN
+F 1 "Choc" H 4691 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 4400 3300 50  0001 C CNN
+F 3 "" H 4400 3300 50  0000 C CNN
+F 4 "Kailh" H 4400 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 4400 3300 50  0001 C CNN "Manufacturer_No"
+	1    4400 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D1
+U 1 1 594D7FFC
+P 3550 3600
+F 0 "D1" V 3596 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 3505 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3550 3600 50  0001 C CNN
+F 3 "" V 3550 3600 50  0000 C CNN
+F 4 "ON" H 3550 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 3550 3600 50  0001 C CNN "Manufacturer_No"
+	1    3550 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D2
+U 1 1 594D80D3
+P 4400 3600
+F 0 "D2" V 4446 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 4355 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 4400 3600 50  0001 C CNN
+F 3 "" V 4400 3600 50  0000 C CNN
+F 4 "ON" H 4400 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 4400 3600 50  0001 C CNN "Manufacturer_No"
+	1    4400 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW3
+U 1 1 594D872C
+P 5250 3300
+F 0 "SW3" H 5541 3421 50  0000 L CNN
+F 1 "Choc" H 5541 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 5250 3300 50  0001 C CNN
+F 3 "" H 5250 3300 50  0000 C CNN
+F 4 "Kailh" H 5250 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 5250 3300 50  0001 C CNN "Manufacturer_No"
+	1    5250 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW4
+U 1 1 594D8732
+P 6100 3300
+F 0 "SW4" H 6391 3421 50  0000 L CNN
+F 1 "Choc" H 6391 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6100 3300 50  0001 C CNN
+F 3 "" H 6100 3300 50  0000 C CNN
+F 4 "Kailh" H 6100 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6100 3300 50  0001 C CNN "Manufacturer_No"
+	1    6100 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D3
+U 1 1 594D873A
+P 5250 3600
+F 0 "D3" V 5296 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 5205 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5250 3600 50  0001 C CNN
+F 3 "" V 5250 3600 50  0000 C CNN
+F 4 "ON" H 5250 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 5250 3600 50  0001 C CNN "Manufacturer_No"
+	1    5250 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D4
+U 1 1 594D8740
+P 6100 3600
+F 0 "D4" V 6146 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 6055 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6100 3600 50  0001 C CNN
+F 3 "" V 6100 3600 50  0000 C CNN
+F 4 "ON" H 6100 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6100 3600 50  0001 C CNN "Manufacturer_No"
+	1    6100 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW5
+U 1 1 594D8B3E
+P 6950 3300
+F 0 "SW5" H 7241 3421 50  0000 L CNN
+F 1 "Choc" H 7241 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6950 3300 50  0001 C CNN
+F 3 "" H 6950 3300 50  0000 C CNN
+F 4 "Kailh" H 6950 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6950 3300 50  0001 C CNN "Manufacturer_No"
+	1    6950 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW6
+U 1 1 594D8B44
+P 7800 3300
+F 0 "SW6" H 8091 3421 50  0000 L CNN
+F 1 "Choc" H 8091 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 7800 3300 50  0001 C CNN
+F 3 "" H 7800 3300 50  0000 C CNN
+F 4 "Kailh" H 7800 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 7800 3300 50  0001 C CNN "Manufacturer_No"
+	1    7800 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D5
+U 1 1 594D8B4C
+P 6950 3600
+F 0 "D5" V 6996 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 6905 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6950 3600 50  0001 C CNN
+F 3 "" V 6950 3600 50  0000 C CNN
+F 4 "ON" H 6950 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6950 3600 50  0001 C CNN "Manufacturer_No"
+	1    6950 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D6
+U 1 1 594D8B52
+P 7800 3600
+F 0 "D6" V 7846 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 7755 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7800 3600 50  0001 C CNN
+F 3 "" V 7800 3600 50  0000 C CNN
+F 4 "ON" H 7800 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 7800 3600 50  0001 C CNN "Manufacturer_No"
+	1    7800 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW7
+U 1 1 594D8B58
+P 8650 3300
+F 0 "SW7" H 8941 3421 50  0000 L CNN
+F 1 "Choc" H 8941 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 8650 3300 50  0001 C CNN
+F 3 "" H 8650 3300 50  0000 C CNN
+F 4 "Kailh" H 8650 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 8650 3300 50  0001 C CNN "Manufacturer_No"
+	1    8650 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW8
+U 1 1 594D8B5E
+P 9500 3300
+F 0 "SW8" H 9791 3421 50  0000 L CNN
+F 1 "Choc" H 9791 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 9500 3300 50  0001 C CNN
+F 3 "" H 9500 3300 50  0000 C CNN
+F 4 "Kailh" H 9500 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 9500 3300 50  0001 C CNN "Manufacturer_No"
+	1    9500 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D7
+U 1 1 594D8B66
+P 8650 3600
+F 0 "D7" V 8696 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 8605 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 8650 3600 50  0001 C CNN
+F 3 "" V 8650 3600 50  0000 C CNN
+F 4 "ON" H 8650 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 8650 3600 50  0001 C CNN "Manufacturer_No"
+	1    8650 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D8
+U 1 1 594D8B6C
+P 9500 3600
+F 0 "D8" V 9546 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 9455 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 9500 3600 50  0001 C CNN
+F 3 "" V 9500 3600 50  0000 C CNN
+F 4 "ON" H 9500 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 9500 3600 50  0001 C CNN "Manufacturer_No"
+	1    9500 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW9
+U 1 1 594D96D7
+P 10350 3300
+F 0 "SW9" H 10641 3421 50  0000 L CNN
+F 1 "Choc" H 10641 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 10350 3300 50  0001 C CNN
+F 3 "" H 10350 3300 50  0000 C CNN
+F 4 "Kailh" H 10350 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 10350 3300 50  0001 C CNN "Manufacturer_No"
+	1    10350 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW10
+U 1 1 594D96DD
+P 11200 3300
+F 0 "SW10" H 11491 3421 50  0000 L CNN
+F 1 "Choc" H 11491 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 11200 3300 50  0001 C CNN
+F 3 "" H 11200 3300 50  0000 C CNN
+F 4 "Kailh" H 11200 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 11200 3300 50  0001 C CNN "Manufacturer_No"
+	1    11200 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D9
+U 1 1 594D96E5
+P 10350 3600
+F 0 "D9" V 10396 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 10305 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 10350 3600 50  0001 C CNN
+F 3 "" V 10350 3600 50  0000 C CNN
+F 4 "ON" H 10350 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 10350 3600 50  0001 C CNN "Manufacturer_No"
+	1    10350 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D10
+U 1 1 594D96EB
+P 11200 3600
+F 0 "D10" V 11246 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 11155 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 11200 3600 50  0001 C CNN
+F 3 "" V 11200 3600 50  0000 C CNN
+F 4 "ON" H 11200 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 11200 3600 50  0001 C CNN "Manufacturer_No"
+	1    11200 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW11
+U 1 1 594D96F1
+P 12050 3300
+F 0 "SW11" H 12341 3421 50  0000 L CNN
+F 1 "Choc" H 12341 3330 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 12050 3300 50  0001 C CNN
+F 3 "" H 12050 3300 50  0000 C CNN
+F 4 "Kailh" H 12050 3300 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 12050 3300 50  0001 C CNN "Manufacturer_No"
+	1    12050 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D11
+U 1 1 594D96FF
+P 12050 3600
+F 0 "D11" V 12096 3532 50  0000 R CNN
+F 1 "MMDL914T1G" V 12005 3532 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 12050 3600 50  0001 C CNN
+F 3 "" V 12050 3600 50  0000 C CNN
+F 4 "ON" H 12050 3600 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 12050 3600 50  0001 C CNN "Manufacturer_No"
+	1    12050 3600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW13
+U 1 1 594DAC25
+P 4400 4400
+F 0 "SW13" H 4691 4521 50  0000 L CNN
+F 1 "Choc" H 4691 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 4400 4400 50  0001 C CNN
+F 3 "" H 4400 4400 50  0000 C CNN
+F 4 "Kailh" H 4400 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 4400 4400 50  0001 C CNN "Manufacturer_No"
+	1    4400 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW14
+U 1 1 594DAC2B
+P 5250 4400
+F 0 "SW14" H 5541 4521 50  0000 L CNN
+F 1 "Choc" H 5541 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 5250 4400 50  0001 C CNN
+F 3 "" H 5250 4400 50  0000 C CNN
+F 4 "Kailh" H 5250 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 5250 4400 50  0001 C CNN "Manufacturer_No"
+	1    5250 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D13
+U 1 1 594DAC33
+P 4400 4700
+F 0 "D13" V 4446 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 4355 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 4400 4700 50  0001 C CNN
+F 3 "" V 4400 4700 50  0000 C CNN
+F 4 "ON" H 4400 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 4400 4700 50  0001 C CNN "Manufacturer_No"
+	1    4400 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D14
+U 1 1 594DAC39
+P 5250 4700
+F 0 "D14" V 5296 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 5205 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5250 4700 50  0001 C CNN
+F 3 "" V 5250 4700 50  0000 C CNN
+F 4 "ON" H 5250 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 5250 4700 50  0001 C CNN "Manufacturer_No"
+	1    5250 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW15
+U 1 1 594DAC3F
+P 6100 4400
+F 0 "SW15" H 6391 4521 50  0000 L CNN
+F 1 "Choc" H 6391 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6100 4400 50  0001 C CNN
+F 3 "" H 6100 4400 50  0000 C CNN
+F 4 "Kailh" H 6100 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6100 4400 50  0001 C CNN "Manufacturer_No"
+	1    6100 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW16
+U 1 1 594DAC45
+P 6950 4400
+F 0 "SW16" H 7241 4521 50  0000 L CNN
+F 1 "Choc" H 7241 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6950 4400 50  0001 C CNN
+F 3 "" H 6950 4400 50  0000 C CNN
+F 4 "Kailh" H 6950 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6950 4400 50  0001 C CNN "Manufacturer_No"
+	1    6950 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D15
+U 1 1 594DAC4C
+P 6100 4700
+F 0 "D15" V 6146 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 6055 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6100 4700 50  0001 C CNN
+F 3 "" V 6100 4700 50  0000 C CNN
+F 4 "ON" H 6100 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6100 4700 50  0001 C CNN "Manufacturer_No"
+	1    6100 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D16
+U 1 1 594DAC52
+P 6950 4700
+F 0 "D16" V 6996 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 6905 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6950 4700 50  0001 C CNN
+F 3 "" V 6950 4700 50  0000 C CNN
+F 4 "ON" H 6950 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6950 4700 50  0001 C CNN "Manufacturer_No"
+	1    6950 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW17
+U 1 1 594DAC58
+P 7800 4400
+F 0 "SW17" H 8091 4521 50  0000 L CNN
+F 1 "Choc" H 8091 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 7800 4400 50  0001 C CNN
+F 3 "" H 7800 4400 50  0000 C CNN
+F 4 "Kailh" H 7800 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 7800 4400 50  0001 C CNN "Manufacturer_No"
+	1    7800 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW18
+U 1 1 594DAC5E
+P 8650 4400
+F 0 "SW18" H 8941 4521 50  0000 L CNN
+F 1 "Choc" H 8941 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 8650 4400 50  0001 C CNN
+F 3 "" H 8650 4400 50  0000 C CNN
+F 4 "Kailh" H 8650 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 8650 4400 50  0001 C CNN "Manufacturer_No"
+	1    8650 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D17
+U 1 1 594DAC65
+P 7800 4700
+F 0 "D17" V 7846 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 7755 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7800 4700 50  0001 C CNN
+F 3 "" V 7800 4700 50  0000 C CNN
+F 4 "ON" H 7800 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 7800 4700 50  0001 C CNN "Manufacturer_No"
+	1    7800 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D18
+U 1 1 594DAC6B
+P 8650 4700
+F 0 "D18" V 8696 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 8605 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 8650 4700 50  0001 C CNN
+F 3 "" V 8650 4700 50  0000 C CNN
+F 4 "ON" H 8650 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 8650 4700 50  0001 C CNN "Manufacturer_No"
+	1    8650 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW19
+U 1 1 594DAC71
+P 9500 4400
+F 0 "SW19" H 9791 4521 50  0000 L CNN
+F 1 "Choc" H 9791 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 9500 4400 50  0001 C CNN
+F 3 "" H 9500 4400 50  0000 C CNN
+F 4 "Kailh" H 9500 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 9500 4400 50  0001 C CNN "Manufacturer_No"
+	1    9500 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW20
+U 1 1 594DAC77
+P 10350 4400
+F 0 "SW20" H 10641 4521 50  0000 L CNN
+F 1 "Choc" H 10641 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 10350 4400 50  0001 C CNN
+F 3 "" H 10350 4400 50  0000 C CNN
+F 4 "Kailh" H 10350 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 10350 4400 50  0001 C CNN "Manufacturer_No"
+	1    10350 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D19
+U 1 1 594DAC7E
+P 9500 4700
+F 0 "D19" V 9546 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 9455 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 9500 4700 50  0001 C CNN
+F 3 "" V 9500 4700 50  0000 C CNN
+F 4 "ON" H 9500 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 9500 4700 50  0001 C CNN "Manufacturer_No"
+	1    9500 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D20
+U 1 1 594DAC84
+P 10350 4700
+F 0 "D20" V 10396 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 10305 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 10350 4700 50  0001 C CNN
+F 3 "" V 10350 4700 50  0000 C CNN
+F 4 "ON" H 10350 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 10350 4700 50  0001 C CNN "Manufacturer_No"
+	1    10350 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW21
+U 1 1 594DAC8A
+P 11200 4400
+F 0 "SW21" H 11491 4521 50  0000 L CNN
+F 1 "Choc" H 11491 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 11200 4400 50  0001 C CNN
+F 3 "" H 11200 4400 50  0000 C CNN
+F 4 "Kailh" H 11200 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 11200 4400 50  0001 C CNN "Manufacturer_No"
+	1    11200 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW22
+U 1 1 594DAC90
+P 12050 4400
+F 0 "SW22" H 12341 4521 50  0000 L CNN
+F 1 "Choc" H 12341 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 12050 4400 50  0001 C CNN
+F 3 "" H 12050 4400 50  0000 C CNN
+F 4 "Kailh" H 12050 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 12050 4400 50  0001 C CNN "Manufacturer_No"
+	1    12050 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D21
+U 1 1 594DAC97
+P 11200 4700
+F 0 "D21" V 11246 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 11155 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 11200 4700 50  0001 C CNN
+F 3 "" V 11200 4700 50  0000 C CNN
+F 4 "ON" H 11200 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 11200 4700 50  0001 C CNN "Manufacturer_No"
+	1    11200 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D22
+U 1 1 594DAC9D
+P 12050 4700
+F 0 "D22" V 12096 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 12005 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 12050 4700 50  0001 C CNN
+F 3 "" V 12050 4700 50  0000 C CNN
+F 4 "ON" H 12050 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 12050 4700 50  0001 C CNN "Manufacturer_No"
+	1    12050 4700
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW24
+U 1 1 594DBB03
+P 4400 5500
+F 0 "SW24" H 4691 5621 50  0000 L CNN
+F 1 "Choc" H 4691 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 4400 5500 50  0001 C CNN
+F 3 "" H 4400 5500 50  0000 C CNN
+F 4 "Kailh" H 4400 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 4400 5500 50  0001 C CNN "Manufacturer_No"
+	1    4400 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW25
+U 1 1 594DBB09
+P 5250 5500
+F 0 "SW25" H 5541 5621 50  0000 L CNN
+F 1 "Choc" H 5541 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 5250 5500 50  0001 C CNN
+F 3 "" H 5250 5500 50  0000 C CNN
+F 4 "Kailh" H 5250 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 5250 5500 50  0001 C CNN "Manufacturer_No"
+	1    5250 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D24
+U 1 1 594DBB11
+P 4400 5800
+F 0 "D24" V 4446 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 4355 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 4400 5800 50  0001 C CNN
+F 3 "" V 4400 5800 50  0000 C CNN
+F 4 "ON" H 4400 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 4400 5800 50  0001 C CNN "Manufacturer_No"
+	1    4400 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D25
+U 1 1 594DBB17
+P 5250 5800
+F 0 "D25" V 5296 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 5205 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5250 5800 50  0001 C CNN
+F 3 "" V 5250 5800 50  0000 C CNN
+F 4 "ON" H 5250 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 5250 5800 50  0001 C CNN "Manufacturer_No"
+	1    5250 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW26
+U 1 1 594DBB1D
+P 6100 5500
+F 0 "SW26" H 6391 5621 50  0000 L CNN
+F 1 "Choc" H 6391 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6100 5500 50  0001 C CNN
+F 3 "" H 6100 5500 50  0000 C CNN
+F 4 "Kailh" H 6100 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6100 5500 50  0001 C CNN "Manufacturer_No"
+	1    6100 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW27
+U 1 1 594DBB23
+P 6950 5500
+F 0 "SW27" H 7241 5621 50  0000 L CNN
+F 1 "Choc" H 7241 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6950 5500 50  0001 C CNN
+F 3 "" H 6950 5500 50  0000 C CNN
+F 4 "Kailh" H 6950 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6950 5500 50  0001 C CNN "Manufacturer_No"
+	1    6950 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D26
+U 1 1 594DBB2A
+P 6100 5800
+F 0 "D26" V 6146 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 6055 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6100 5800 50  0001 C CNN
+F 3 "" V 6100 5800 50  0000 C CNN
+F 4 "ON" H 6100 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6100 5800 50  0001 C CNN "Manufacturer_No"
+	1    6100 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D27
+U 1 1 594DBB30
+P 6950 5800
+F 0 "D27" V 6996 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 6905 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6950 5800 50  0001 C CNN
+F 3 "" V 6950 5800 50  0000 C CNN
+F 4 "ON" H 6950 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6950 5800 50  0001 C CNN "Manufacturer_No"
+	1    6950 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW28
+U 1 1 594DBB36
+P 7800 5500
+F 0 "SW28" H 8091 5621 50  0000 L CNN
+F 1 "Choc" H 8091 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 7800 5500 50  0001 C CNN
+F 3 "" H 7800 5500 50  0000 C CNN
+F 4 "Kailh" H 7800 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 7800 5500 50  0001 C CNN "Manufacturer_No"
+	1    7800 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW29
+U 1 1 594DBB3C
+P 8650 5500
+F 0 "SW29" H 8941 5621 50  0000 L CNN
+F 1 "Choc" H 8941 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 8650 5500 50  0001 C CNN
+F 3 "" H 8650 5500 50  0000 C CNN
+F 4 "Kailh" H 8650 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 8650 5500 50  0001 C CNN "Manufacturer_No"
+	1    8650 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D28
+U 1 1 594DBB43
+P 7800 5800
+F 0 "D28" V 7846 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 7755 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7800 5800 50  0001 C CNN
+F 3 "" V 7800 5800 50  0000 C CNN
+F 4 "ON" H 7800 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 7800 5800 50  0001 C CNN "Manufacturer_No"
+	1    7800 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D29
+U 1 1 594DBB49
+P 8650 5800
+F 0 "D29" V 8696 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 8605 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 8650 5800 50  0001 C CNN
+F 3 "" V 8650 5800 50  0000 C CNN
+F 4 "ON" H 8650 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 8650 5800 50  0001 C CNN "Manufacturer_No"
+	1    8650 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW30
+U 1 1 594DBB4F
+P 9500 5500
+F 0 "SW30" H 9791 5621 50  0000 L CNN
+F 1 "Choc" H 9791 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 9500 5500 50  0001 C CNN
+F 3 "" H 9500 5500 50  0000 C CNN
+F 4 "Kailh" H 9500 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 9500 5500 50  0001 C CNN "Manufacturer_No"
+	1    9500 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW31
+U 1 1 594DBB55
+P 10350 5500
+F 0 "SW31" H 10641 5621 50  0000 L CNN
+F 1 "Choc" H 10641 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 10350 5500 50  0001 C CNN
+F 3 "" H 10350 5500 50  0000 C CNN
+F 4 "Kailh" H 10350 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 10350 5500 50  0001 C CNN "Manufacturer_No"
+	1    10350 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D30
+U 1 1 594DBB5C
+P 9500 5800
+F 0 "D30" V 9546 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 9455 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 9500 5800 50  0001 C CNN
+F 3 "" V 9500 5800 50  0000 C CNN
+F 4 "ON" H 9500 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 9500 5800 50  0001 C CNN "Manufacturer_No"
+	1    9500 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D31
+U 1 1 594DBB62
+P 10350 5800
+F 0 "D31" V 10396 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 10305 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 10350 5800 50  0001 C CNN
+F 3 "" V 10350 5800 50  0000 C CNN
+F 4 "ON" H 10350 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 10350 5800 50  0001 C CNN "Manufacturer_No"
+	1    10350 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW32
+U 1 1 594DBB68
+P 11200 5500
+F 0 "SW32" H 11491 5621 50  0000 L CNN
+F 1 "Choc" H 11491 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 11200 5500 50  0001 C CNN
+F 3 "" H 11200 5500 50  0000 C CNN
+F 4 "Kailh" H 11200 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 11200 5500 50  0001 C CNN "Manufacturer_No"
+	1    11200 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW33
+U 1 1 594DBB6E
+P 12050 5500
+F 0 "SW33" H 12341 5621 50  0000 L CNN
+F 1 "Choc" H 12341 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 12050 5500 50  0001 C CNN
+F 3 "" H 12050 5500 50  0000 C CNN
+F 4 "Kailh" H 12050 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 12050 5500 50  0001 C CNN "Manufacturer_No"
+	1    12050 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D32
+U 1 1 594DBB75
+P 11200 5800
+F 0 "D32" V 11246 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 11155 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 11200 5800 50  0001 C CNN
+F 3 "" V 11200 5800 50  0000 C CNN
+F 4 "ON" H 11200 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 11200 5800 50  0001 C CNN "Manufacturer_No"
+	1    11200 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D33
+U 1 1 594DBB7B
+P 12050 5800
+F 0 "D33" V 12096 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 12005 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 12050 5800 50  0001 C CNN
+F 3 "" V 12050 5800 50  0000 C CNN
+F 4 "ON" H 12050 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 12050 5800 50  0001 C CNN "Manufacturer_No"
+	1    12050 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW34
+U 1 1 594DBBA0
+P 3550 6550
+F 0 "SW34" H 3841 6671 50  0000 L CNN
+F 1 "Choc" H 3841 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 3550 6550 50  0001 C CNN
+F 3 "" H 3550 6550 50  0000 C CNN
+F 4 "Kailh" H 3550 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 3550 6550 50  0001 C CNN "Manufacturer_No"
+	1    3550 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D34
+U 1 1 594DBBAD
+P 3550 6850
+F 0 "D34" V 3596 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 3505 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3550 6850 50  0001 C CNN
+F 3 "" V 3550 6850 50  0000 C CNN
+F 4 "ON" H 3550 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 3550 6850 50  0001 C CNN "Manufacturer_No"
+	1    3550 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW35
+U 1 1 594DCA61
+P 4400 6550
+F 0 "SW35" H 4691 6671 50  0000 L CNN
+F 1 "Choc" H 4691 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 4400 6550 50  0001 C CNN
+F 3 "" H 4400 6550 50  0000 C CNN
+F 4 "Kailh" H 4400 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 4400 6550 50  0001 C CNN "Manufacturer_No"
+	1    4400 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW36
+U 1 1 594DCA67
+P 5250 6550
+F 0 "SW36" H 5541 6671 50  0000 L CNN
+F 1 "Choc" H 5541 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 5250 6550 50  0001 C CNN
+F 3 "" H 5250 6550 50  0000 C CNN
+F 4 "Kailh" H 5250 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 5250 6550 50  0001 C CNN "Manufacturer_No"
+	1    5250 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D35
+U 1 1 594DCA6F
+P 4400 6850
+F 0 "D35" V 4446 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 4355 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 4400 6850 50  0001 C CNN
+F 3 "" V 4400 6850 50  0000 C CNN
+F 4 "ON" H 4400 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 4400 6850 50  0001 C CNN "Manufacturer_No"
+	1    4400 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D36
+U 1 1 594DCA75
+P 5250 6850
+F 0 "D36" V 5296 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 5205 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5250 6850 50  0001 C CNN
+F 3 "" V 5250 6850 50  0000 C CNN
+F 4 "ON" H 5250 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 5250 6850 50  0001 C CNN "Manufacturer_No"
+	1    5250 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW37
+U 1 1 594DCA7B
+P 6100 6550
+F 0 "SW37" H 6391 6671 50  0000 L CNN
+F 1 "Choc" H 6391 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6100 6550 50  0001 C CNN
+F 3 "" H 6100 6550 50  0000 C CNN
+F 4 "Kailh" H 6100 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6100 6550 50  0001 C CNN "Manufacturer_No"
+	1    6100 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW38
+U 1 1 594DCA81
+P 6950 6550
+F 0 "SW38" H 7241 6671 50  0000 L CNN
+F 1 "Choc" H 7241 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6950 6550 50  0001 C CNN
+F 3 "" H 6950 6550 50  0000 C CNN
+F 4 "Kailh" H 6950 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6950 6550 50  0001 C CNN "Manufacturer_No"
+	1    6950 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D37
+U 1 1 594DCA88
+P 6100 6850
+F 0 "D37" V 6146 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 6055 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6100 6850 50  0001 C CNN
+F 3 "" V 6100 6850 50  0000 C CNN
+F 4 "ON" H 6100 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6100 6850 50  0001 C CNN "Manufacturer_No"
+	1    6100 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D38
+U 1 1 594DCA8E
+P 6950 6850
+F 0 "D38" V 6996 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 6905 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6950 6850 50  0001 C CNN
+F 3 "" V 6950 6850 50  0000 C CNN
+F 4 "ON" H 6950 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6950 6850 50  0001 C CNN "Manufacturer_No"
+	1    6950 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW39
+U 1 1 594DCA94
+P 7800 6550
+F 0 "SW39" H 8091 6671 50  0000 L CNN
+F 1 "Choc" H 8091 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 7800 6550 50  0001 C CNN
+F 3 "" H 7800 6550 50  0000 C CNN
+F 4 "Kailh" H 7800 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 7800 6550 50  0001 C CNN "Manufacturer_No"
+	1    7800 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW40
+U 1 1 594DCA9A
+P 8650 6550
+F 0 "SW40" H 8941 6671 50  0000 L CNN
+F 1 "Choc" H 8941 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 8650 6550 50  0001 C CNN
+F 3 "" H 8650 6550 50  0000 C CNN
+F 4 "Kailh" H 8650 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 8650 6550 50  0001 C CNN "Manufacturer_No"
+	1    8650 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D39
+U 1 1 594DCAA1
+P 7800 6850
+F 0 "D39" V 7846 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 7755 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7800 6850 50  0001 C CNN
+F 3 "" V 7800 6850 50  0000 C CNN
+F 4 "ON" H 7800 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 7800 6850 50  0001 C CNN "Manufacturer_No"
+	1    7800 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D40
+U 1 1 594DCAA7
+P 8650 6850
+F 0 "D40" V 8696 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 8605 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 8650 6850 50  0001 C CNN
+F 3 "" V 8650 6850 50  0000 C CNN
+F 4 "ON" H 8650 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 8650 6850 50  0001 C CNN "Manufacturer_No"
+	1    8650 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW41
+U 1 1 594DCAAD
+P 9500 6550
+F 0 "SW41" H 9791 6671 50  0000 L CNN
+F 1 "Choc" H 9791 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 9500 6550 50  0001 C CNN
+F 3 "" H 9500 6550 50  0000 C CNN
+F 4 "Kailh" H 9500 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 9500 6550 50  0001 C CNN "Manufacturer_No"
+	1    9500 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW42
+U 1 1 594DCAB3
+P 10350 6550
+F 0 "SW42" H 10641 6671 50  0000 L CNN
+F 1 "Choc" H 10641 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 10350 6550 50  0001 C CNN
+F 3 "" H 10350 6550 50  0000 C CNN
+F 4 "Kailh" H 10350 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 10350 6550 50  0001 C CNN "Manufacturer_No"
+	1    10350 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D41
+U 1 1 594DCABA
+P 9500 6850
+F 0 "D41" V 9546 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 9455 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 9500 6850 50  0001 C CNN
+F 3 "" V 9500 6850 50  0000 C CNN
+F 4 "ON" H 9500 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 9500 6850 50  0001 C CNN "Manufacturer_No"
+	1    9500 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D42
+U 1 1 594DCAC0
+P 10350 6850
+F 0 "D42" V 10396 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 10305 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 10350 6850 50  0001 C CNN
+F 3 "" V 10350 6850 50  0000 C CNN
+F 4 "ON" H 10350 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 10350 6850 50  0001 C CNN "Manufacturer_No"
+	1    10350 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW43
+U 1 1 594DCAC6
+P 11200 6550
+F 0 "SW43" H 11491 6671 50  0000 L CNN
+F 1 "Choc" H 11491 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 11200 6550 50  0001 C CNN
+F 3 "" H 11200 6550 50  0000 C CNN
+F 4 "Kailh" H 11200 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 11200 6550 50  0001 C CNN "Manufacturer_No"
+	1    11200 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW44
+U 1 1 594DCACC
+P 12050 6550
+F 0 "SW44" H 12341 6671 50  0000 L CNN
+F 1 "Choc" H 12341 6580 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 12050 6550 50  0001 C CNN
+F 3 "" H 12050 6550 50  0000 C CNN
+F 4 "Kailh" H 12050 6550 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 12050 6550 50  0001 C CNN "Manufacturer_No"
+	1    12050 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D43
+U 1 1 594DCAD3
+P 11200 6850
+F 0 "D43" V 11246 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 11155 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 11200 6850 50  0001 C CNN
+F 3 "" V 11200 6850 50  0000 C CNN
+F 4 "ON" H 11200 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 11200 6850 50  0001 C CNN "Manufacturer_No"
+	1    11200 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D44
+U 1 1 594DCAD9
+P 12050 6850
+F 0 "D44" V 12096 6782 50  0000 R CNN
+F 1 "MMDL914T1G" V 12005 6782 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 12050 6850 50  0001 C CNN
+F 3 "" V 12050 6850 50  0000 C CNN
+F 4 "ON" H 12050 6850 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 12050 6850 50  0001 C CNN "Manufacturer_No"
+	1    12050 6850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW45
+U 1 1 594DCB17
+P 3550 7650
+F 0 "SW45" H 3841 7771 50  0000 L CNN
+F 1 "Choc" H 3841 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 3550 7650 50  0001 C CNN
+F 3 "" H 3550 7650 50  0000 C CNN
+F 4 "Kailh" H 3550 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 3550 7650 50  0001 C CNN "Manufacturer_No"
+	1    3550 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW46
+U 1 1 594DCB1D
+P 4400 7650
+F 0 "SW46" H 4691 7771 50  0000 L CNN
+F 1 "Choc" H 4691 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 4400 7650 50  0001 C CNN
+F 3 "" H 4400 7650 50  0000 C CNN
+F 4 "Kailh" H 4400 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 4400 7650 50  0001 C CNN "Manufacturer_No"
+	1    4400 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D45
+U 1 1 594DCB25
+P 3550 7950
+F 0 "D45" V 3596 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 3505 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3550 7950 50  0001 C CNN
+F 3 "" V 3550 7950 50  0000 C CNN
+F 4 "ON" H 3550 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 3550 7950 50  0001 C CNN "Manufacturer_No"
+	1    3550 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D46
+U 1 1 594DCB2B
+P 4400 7950
+F 0 "D46" V 4446 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 4355 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 4400 7950 50  0001 C CNN
+F 3 "" V 4400 7950 50  0000 C CNN
+F 4 "ON" H 4400 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 4400 7950 50  0001 C CNN "Manufacturer_No"
+	1    4400 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW47
+U 1 1 594DCB31
+P 5250 7650
+F 0 "SW47" H 5541 7771 50  0000 L CNN
+F 1 "Choc" H 5541 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 5250 7650 50  0001 C CNN
+F 3 "" H 5250 7650 50  0000 C CNN
+F 4 "Kailh" H 5250 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 5250 7650 50  0001 C CNN "Manufacturer_No"
+	1    5250 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW48
+U 1 1 594DCB37
+P 6100 7650
+F 0 "SW48" H 6391 7771 50  0000 L CNN
+F 1 "Choc" H 6391 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6100 7650 50  0001 C CNN
+F 3 "" H 6100 7650 50  0000 C CNN
+F 4 "Kailh" H 6100 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6100 7650 50  0001 C CNN "Manufacturer_No"
+	1    6100 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D47
+U 1 1 594DCB3E
+P 5250 7950
+F 0 "D47" V 5296 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 5205 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 5250 7950 50  0001 C CNN
+F 3 "" V 5250 7950 50  0000 C CNN
+F 4 "ON" H 5250 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 5250 7950 50  0001 C CNN "Manufacturer_No"
+	1    5250 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D48
+U 1 1 594DCB44
+P 6100 7950
+F 0 "D48" V 6146 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 6055 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6100 7950 50  0001 C CNN
+F 3 "" V 6100 7950 50  0000 C CNN
+F 4 "ON" H 6100 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6100 7950 50  0001 C CNN "Manufacturer_No"
+	1    6100 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW49
+U 1 1 594DCB4A
+P 6950 7650
+F 0 "SW49" H 7241 7771 50  0000 L CNN
+F 1 "Choc" H 7241 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 6950 7650 50  0001 C CNN
+F 3 "" H 6950 7650 50  0000 C CNN
+F 4 "Kailh" H 6950 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 6950 7650 50  0001 C CNN "Manufacturer_No"
+	1    6950 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW50
+U 1 1 594DCB50
+P 7800 7650
+F 0 "SW50" H 8091 7771 50  0000 L CNN
+F 1 "Choc" H 8091 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 7800 7650 50  0001 C CNN
+F 3 "" H 7800 7650 50  0000 C CNN
+F 4 "Kailh" H 7800 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 7800 7650 50  0001 C CNN "Manufacturer_No"
+	1    7800 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D49
+U 1 1 594DCB57
+P 6950 7950
+F 0 "D49" V 6996 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 6905 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 6950 7950 50  0001 C CNN
+F 3 "" V 6950 7950 50  0000 C CNN
+F 4 "ON" H 6950 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 6950 7950 50  0001 C CNN "Manufacturer_No"
+	1    6950 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D50
+U 1 1 594DCB5D
+P 7800 7950
+F 0 "D50" V 7846 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 7755 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 7800 7950 50  0001 C CNN
+F 3 "" V 7800 7950 50  0000 C CNN
+F 4 "ON" H 7800 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 7800 7950 50  0001 C CNN "Manufacturer_No"
+	1    7800 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW51
+U 1 1 594DCB63
+P 8650 7650
+F 0 "SW51" H 8941 7771 50  0000 L CNN
+F 1 "Choc" H 8941 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 8650 7650 50  0001 C CNN
+F 3 "" H 8650 7650 50  0000 C CNN
+F 4 "Kailh" H 8650 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 8650 7650 50  0001 C CNN "Manufacturer_No"
+	1    8650 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW52
+U 1 1 594DCB69
+P 9500 7650
+F 0 "SW52" H 9791 7771 50  0000 L CNN
+F 1 "Choc" H 9791 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 9500 7650 50  0001 C CNN
+F 3 "" H 9500 7650 50  0000 C CNN
+F 4 "Kailh" H 9500 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 9500 7650 50  0001 C CNN "Manufacturer_No"
+	1    9500 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D51
+U 1 1 594DCB70
+P 8650 7950
+F 0 "D51" V 8696 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 8605 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 8650 7950 50  0001 C CNN
+F 3 "" V 8650 7950 50  0000 C CNN
+F 4 "ON" H 8650 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 8650 7950 50  0001 C CNN "Manufacturer_No"
+	1    8650 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D52
+U 1 1 594DCB76
+P 9500 7950
+F 0 "D52" V 9546 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 9455 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 9500 7950 50  0001 C CNN
+F 3 "" V 9500 7950 50  0000 C CNN
+F 4 "ON" H 9500 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 9500 7950 50  0001 C CNN "Manufacturer_No"
+	1    9500 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW53
+U 1 1 594DCB7C
+P 10350 7650
+F 0 "SW53" H 10641 7771 50  0000 L CNN
+F 1 "Choc" H 10641 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 10350 7650 50  0001 C CNN
+F 3 "" H 10350 7650 50  0000 C CNN
+F 4 "Kailh" H 10350 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 10350 7650 50  0001 C CNN "Manufacturer_No"
+	1    10350 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW54
+U 1 1 594DCB82
+P 11200 7650
+F 0 "SW54" H 11491 7771 50  0000 L CNN
+F 1 "Choc" H 11491 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 11200 7650 50  0001 C CNN
+F 3 "" H 11200 7650 50  0000 C CNN
+F 4 "Kailh" H 11200 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 11200 7650 50  0001 C CNN "Manufacturer_No"
+	1    11200 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D53
+U 1 1 594DCB89
+P 10350 7950
+F 0 "D53" V 10396 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 10305 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 10350 7950 50  0001 C CNN
+F 3 "" V 10350 7950 50  0000 C CNN
+F 4 "ON" H 10350 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 10350 7950 50  0001 C CNN "Manufacturer_No"
+	1    10350 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D54
+U 1 1 594DCB8F
+P 11200 7950
+F 0 "D54" V 11246 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 11155 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 11200 7950 50  0001 C CNN
+F 3 "" V 11200 7950 50  0000 C CNN
+F 4 "ON" H 11200 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 11200 7950 50  0001 C CNN "Manufacturer_No"
+	1    11200 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW55
+U 1 1 594DCB95
+P 12050 7650
+F 0 "SW55" H 12341 7771 50  0000 L CNN
+F 1 "Choc" H 12341 7680 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 12050 7650 50  0001 C CNN
+F 3 "" H 12050 7650 50  0000 C CNN
+F 4 "Kailh" H 12050 7650 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 12050 7650 50  0001 C CNN "Manufacturer_No"
+	1    12050 7650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D55
+U 1 1 594DCBA2
+P 12050 7950
+F 0 "D55" V 12096 7882 50  0000 R CNN
+F 1 "MMDL914T1G" V 12005 7882 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 12050 7950 50  0001 C CNN
+F 3 "" V 12050 7950 50  0000 C CNN
+F 4 "ON" H 12050 7950 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 12050 7950 50  0001 C CNN "Manufacturer_No"
+	1    12050 7950
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:D_Small D23
+U 1 1 594DACCF
+P 3550 5800
+F 0 "D23" V 3596 5732 50  0000 R CNN
+F 1 "MMDL914T1G" V 3505 5732 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3550 5800 50  0001 C CNN
+F 3 "" V 3550 5800 50  0000 C CNN
+F 4 "ON" H 3550 5800 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 3550 5800 50  0001 C CNN "Manufacturer_No"
+	1    3550 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW23
+U 1 1 594DACC2
+P 3550 5500
+F 0 "SW23" H 3841 5621 50  0000 L CNN
+F 1 "Choc" H 3841 5530 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 3550 5500 50  0001 C CNN
+F 3 "" H 3550 5500 50  0000 C CNN
+F 4 "Kailh" H 3550 5500 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 3550 5500 50  0001 C CNN "Manufacturer_No"
+	1    3550 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L mntcomp-keyboard:Choc SW12
+U 1 1 594EABB7
+P 3550 4400
+F 0 "SW12" H 3841 4521 50  0000 L CNN
+F 1 "Choc" H 3841 4430 50  0000 L CNN
+F 2 "footprints:cherry-ml" H 3550 4400 50  0001 C CNN
+F 3 "" H 3550 4400 50  0000 C CNN
+F 4 "Kailh" H 3550 4400 50  0001 C CNN "Manufacturer"
+F 5 "CPG135001D02" H 3550 4400 50  0001 C CNN "Manufacturer_No"
+	1    3550 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Small D12
+U 1 1 594EABBD
+P 3550 4700
+F 0 "D12" V 3596 4632 50  0000 R CNN
+F 1 "MMDL914T1G" V 3505 4632 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" V 3550 4700 50  0001 C CNN
+F 3 "" V 3550 4700 50  0000 C CNN
+F 4 "ON" H 3550 4700 50  0001 C CNN "Manufacturer"
+F 5 "MMDL914T1G" H 3550 4700 50  0001 C CNN "Manufacturer_No"
+	1    3550 4700
+	0    -1   -1   0   
+$EndComp
+Text GLabel 2350 3700 0    60   Input ~ 0
+ROW1
+Text GLabel 2350 3800 0    60   Input ~ 0
+ROW2
+Text GLabel 2350 3900 0    60   Input ~ 0
+ROW3
+Text GLabel 2350 4000 0    60   Input ~ 0
+ROW4
+Text GLabel 2350 4100 0    60   Input ~ 0
+ROW5
+Text GLabel 3150 2200 1    60   Input ~ 0
+COL1
+Text GLabel 3250 2200 1    60   Input ~ 0
+COL2
+Text GLabel 3350 2200 1    60   Input ~ 0
+COL3
+Text GLabel 3450 2200 1    60   Input ~ 0
+COL4
+Text GLabel 3550 2200 1    60   Input ~ 0
+COL5
+Text GLabel 3650 2200 1    60   Input ~ 0
+COL6
+Text GLabel 3750 2200 1    60   Input ~ 0
+COL7
+Text GLabel 3850 2200 1    60   Input ~ 0
+COL8
+Text GLabel 3950 2200 1    60   Input ~ 0
+COL9
+Text GLabel 4050 2200 1    60   Input ~ 0
+COL10
+Text GLabel 4150 2200 1    60   Input ~ 0
+COL11
+Wire Wire Line
+	3150 2200 3150 2950
+Wire Wire Line
+	3550 2950 3150 2950
+Connection ~ 3150 2950
+Wire Wire Line
+	3550 4050 3150 4050
+Connection ~ 3150 4050
+Wire Wire Line
+	4400 5150 4050 5150
+Wire Wire Line
+	4400 6200 4050 6200
+Wire Wire Line
+	3550 7300 3150 7300
+Wire Wire Line
+	2350 3800 2850 3800
+Wire Wire Line
+	2850 3800 2850 4800
+Wire Wire Line
+	2350 3900 2750 3900
+Wire Wire Line
+	2750 3900 2750 5900
+Wire Wire Line
+	2650 6950 2650 4000
+Wire Wire Line
+	2650 4000 2350 4000
+Wire Wire Line
+	2350 4100 2550 4100
+Wire Wire Line
+	2550 4100 2550 8050
+Wire Wire Line
+	3250 2200 3250 2900
+Wire Wire Line
+	3250 2900 4050 2900
+Wire Wire Line
+	4400 2900 4400 2950
+Wire Wire Line
+	3350 2200 3350 2850
+Wire Wire Line
+	3350 2850 4900 2850
+Wire Wire Line
+	5250 2850 5250 2950
+Wire Wire Line
+	3450 2200 3450 2800
+Wire Wire Line
+	3450 2800 5750 2800
+Wire Wire Line
+	6100 2800 6100 2950
+Wire Wire Line
+	3550 2200 3550 2750
+Wire Wire Line
+	3550 2750 6600 2750
+Wire Wire Line
+	6950 2750 6950 2950
+Wire Wire Line
+	3650 2200 3650 2700
+Wire Wire Line
+	3650 2700 7450 2700
+Wire Wire Line
+	7800 2700 7800 2950
+Wire Wire Line
+	3750 2200 3750 2650
+Wire Wire Line
+	3750 2650 8300 2650
+Wire Wire Line
+	8650 2650 8650 2950
+Wire Wire Line
+	3850 2200 3850 2600
+Wire Wire Line
+	3850 2600 9150 2600
+Wire Wire Line
+	9500 2600 9500 2950
+Wire Wire Line
+	3950 2200 3950 2550
+Wire Wire Line
+	3950 2550 10000 2550
+Wire Wire Line
+	10350 2550 10350 2950
+Wire Wire Line
+	11200 2500 11200 2950
+Wire Wire Line
+	4050 2500 10850 2500
+Wire Wire Line
+	4050 2500 4050 2200
+Wire Wire Line
+	4150 2200 4150 2450
+Wire Wire Line
+	4150 2450 11700 2450
+Wire Wire Line
+	12050 2450 12050 2950
+Wire Wire Line
+	4050 2900 4050 4050
+Connection ~ 4050 2900
+Wire Wire Line
+	4400 4050 4050 4050
+Wire Wire Line
+	5250 5150 4900 5150
+Connection ~ 4900 5150
+Wire Wire Line
+	5250 6200 4900 6200
+Connection ~ 4900 6200
+Wire Wire Line
+	4400 7300 4050 7300
+Wire Wire Line
+	4900 2850 4900 4050
+Connection ~ 4900 2850
+Wire Wire Line
+	5750 2800 5750 4050
+Connection ~ 5750 2800
+Wire Wire Line
+	6600 2750 6600 4050
+Connection ~ 6600 2750
+Wire Wire Line
+	7450 2700 7450 4050
+Connection ~ 7450 2700
+Wire Wire Line
+	8300 2650 8300 4050
+Connection ~ 8300 2650
+Wire Wire Line
+	9150 2600 9150 4050
+Connection ~ 9150 2600
+Connection ~ 10000 2550
+Wire Wire Line
+	10850 2500 10850 4050
+Connection ~ 10850 2500
+Wire Wire Line
+	11700 2450 11700 4050
+Connection ~ 11700 2450
+Wire Wire Line
+	6100 6200 5750 6200
+Connection ~ 5750 6200
+Wire Wire Line
+	6100 5150 5750 5150
+Connection ~ 5750 5150
+Wire Wire Line
+	5250 4050 4900 4050
+Connection ~ 4900 4050
+Wire Wire Line
+	5250 7300 4900 7300
+Wire Wire Line
+	6100 7300 5750 7300
+Wire Wire Line
+	6950 6200 6600 6200
+Connection ~ 6600 6200
+Wire Wire Line
+	6950 5150 6600 5150
+Connection ~ 6600 5150
+Wire Wire Line
+	6100 4050 5750 4050
+Connection ~ 5750 4050
+Wire Wire Line
+	6950 4050 6600 4050
+Connection ~ 6600 4050
+Wire Wire Line
+	7800 4050 7450 4050
+Connection ~ 7450 4050
+Wire Wire Line
+	8650 4050 8300 4050
+Connection ~ 8300 4050
+Wire Wire Line
+	9500 4050 9150 4050
+Connection ~ 9150 4050
+Wire Wire Line
+	10350 5150 10000 5150
+Connection ~ 10000 5150
+Wire Wire Line
+	9500 5150 9150 5150
+Connection ~ 9150 5150
+Wire Wire Line
+	8650 5150 8300 5150
+Connection ~ 8300 5150
+Wire Wire Line
+	7800 5150 7450 5150
+Connection ~ 7450 5150
+Wire Wire Line
+	7800 6200 7450 6200
+Connection ~ 7450 6200
+Wire Wire Line
+	8650 6200 8300 6200
+Connection ~ 8300 6200
+Wire Wire Line
+	9500 6200 9150 6200
+Connection ~ 9150 6200
+Wire Wire Line
+	10350 6200 10000 6200
+Connection ~ 10000 6200
+Wire Wire Line
+	10850 6200 11200 6200
+Connection ~ 10850 6200
+Wire Wire Line
+	10850 5150 11200 5150
+Connection ~ 10850 5150
+Wire Wire Line
+	10350 4050 10000 4050
+Connection ~ 10000 4050
+Wire Wire Line
+	11200 4050 10850 4050
+Connection ~ 10850 4050
+Wire Wire Line
+	12050 5150 11700 5150
+Connection ~ 11700 5150
+Wire Wire Line
+	12050 6200 11700 6200
+Connection ~ 11700 6200
+Wire Wire Line
+	10850 7300 11200 7300
+Wire Wire Line
+	10000 7300 10350 7300
+Wire Wire Line
+	9500 7300 9150 7300
+Wire Wire Line
+	8650 7300 8300 7300
+Wire Wire Line
+	7800 7300 7450 7300
+Wire Wire Line
+	6950 7300 6600 7300
+Wire Wire Line
+	12050 4050 11700 4050
+Connection ~ 11700 4050
+Wire Wire Line
+	10000 2550 10000 4050
+Wire Wire Line
+	11700 7300 12050 7300
+Wire Wire Line
+	3150 2950 3150 4050
+Wire Wire Line
+	4050 2900 4400 2900
+Wire Wire Line
+	4900 4050 4900 5150
+Wire Wire Line
+	4900 5150 4900 6200
+Wire Wire Line
+	4050 6200 4050 7300
+Wire Wire Line
+	4900 2850 5250 2850
+Wire Wire Line
+	5750 2800 6100 2800
+Wire Wire Line
+	6600 2750 6950 2750
+Wire Wire Line
+	7450 2700 7800 2700
+Wire Wire Line
+	8300 2650 8650 2650
+Wire Wire Line
+	9150 2600 9500 2600
+Wire Wire Line
+	10000 2550 10350 2550
+Wire Wire Line
+	10850 2500 11200 2500
+Wire Wire Line
+	11700 2450 12050 2450
+Wire Wire Line
+	4900 6200 4900 7300
+Wire Wire Line
+	5750 5150 5750 6200
+Wire Wire Line
+	5750 4050 5750 5150
+Wire Wire Line
+	5750 6200 5750 7300
+Wire Wire Line
+	6600 5150 6600 6200
+Wire Wire Line
+	6600 4050 6600 5150
+Wire Wire Line
+	7450 4050 7450 5150
+Wire Wire Line
+	8300 4050 8300 5150
+Wire Wire Line
+	9150 4050 9150 5150
+Wire Wire Line
+	10000 4050 10000 5150
+Wire Wire Line
+	10000 5150 10000 6200
+Wire Wire Line
+	9150 5150 9150 6200
+Wire Wire Line
+	8300 5150 8300 6200
+Wire Wire Line
+	7450 5150 7450 6200
+Wire Wire Line
+	6600 6200 6600 7300
+Wire Wire Line
+	7450 6200 7450 7300
+Wire Wire Line
+	8300 6200 8300 7300
+Wire Wire Line
+	9150 6200 9150 7300
+Wire Wire Line
+	10000 6200 10000 7300
+Wire Wire Line
+	10850 5150 10850 6200
+Wire Wire Line
+	10850 4050 10850 5150
+Wire Wire Line
+	11700 4050 11700 5150
+Wire Wire Line
+	11700 5150 11700 6200
+Wire Wire Line
+	10850 6200 10850 7300
+Wire Wire Line
+	11700 6200 11700 7300
+Wire Wire Line
+	2350 3700 3550 3700
+Connection ~ 4400 4800
+Wire Wire Line
+	4400 4800 5250 4800
+Connection ~ 4400 5900
+Wire Wire Line
+	4400 5900 5250 5900
+Connection ~ 4400 6950
+Wire Wire Line
+	4400 6950 5250 6950
+Wire Wire Line
+	3550 8050 4400 8050
+Connection ~ 5250 4800
+Wire Wire Line
+	5250 4800 6100 4800
+Connection ~ 5250 5900
+Wire Wire Line
+	5250 5900 6100 5900
+Connection ~ 5250 6950
+Wire Wire Line
+	5250 6950 6100 6950
+Connection ~ 4400 8050
+Wire Wire Line
+	4400 8050 5250 8050
+Connection ~ 6100 4800
+Wire Wire Line
+	6100 4800 6950 4800
+Connection ~ 6100 5900
+Wire Wire Line
+	6100 5900 6950 5900
+Connection ~ 6100 6950
+Wire Wire Line
+	6100 6950 6950 6950
+Connection ~ 5250 8050
+Wire Wire Line
+	5250 8050 6100 8050
+Connection ~ 6950 4800
+Wire Wire Line
+	6950 4800 7800 4800
+Connection ~ 6950 5900
+Wire Wire Line
+	6950 5900 7800 5900
+Connection ~ 6950 6950
+Wire Wire Line
+	6950 6950 7800 6950
+Connection ~ 6100 8050
+Wire Wire Line
+	6100 8050 6950 8050
+Connection ~ 7800 4800
+Wire Wire Line
+	7800 4800 8650 4800
+Connection ~ 7800 5900
+Wire Wire Line
+	7800 5900 8650 5900
+Connection ~ 7800 6950
+Wire Wire Line
+	7800 6950 8650 6950
+Connection ~ 6950 8050
+Wire Wire Line
+	6950 8050 7800 8050
+Connection ~ 8650 4800
+Wire Wire Line
+	8650 4800 9500 4800
+Connection ~ 8650 5900
+Wire Wire Line
+	8650 5900 9500 5900
+Connection ~ 8650 6950
+Wire Wire Line
+	8650 6950 9500 6950
+Connection ~ 7800 8050
+Wire Wire Line
+	7800 8050 8650 8050
+Connection ~ 9500 4800
+Wire Wire Line
+	9500 4800 10350 4800
+Connection ~ 9500 5900
+Wire Wire Line
+	9500 5900 10350 5900
+Connection ~ 9500 6950
+Wire Wire Line
+	9500 6950 10350 6950
+Connection ~ 8650 8050
+Wire Wire Line
+	8650 8050 9500 8050
+Connection ~ 10350 4800
+Wire Wire Line
+	10350 4800 11200 4800
+Connection ~ 10350 5900
+Wire Wire Line
+	10350 5900 11200 5900
+Connection ~ 10350 6950
+Wire Wire Line
+	10350 6950 11200 6950
+Connection ~ 9500 8050
+Wire Wire Line
+	9500 8050 10350 8050
+Connection ~ 11200 4800
+Wire Wire Line
+	11200 4800 12050 4800
+Connection ~ 11200 5900
+Wire Wire Line
+	11200 5900 12050 5900
+Connection ~ 11200 6950
+Wire Wire Line
+	11200 6950 12050 6950
+Connection ~ 10350 8050
+Wire Wire Line
+	10350 8050 11200 8050
+Connection ~ 11200 8050
+Wire Wire Line
+	11200 8050 12050 8050
+Wire Wire Line
+	2850 4800 3550 4800
+Connection ~ 3550 4800
+Wire Wire Line
+	3550 4800 4400 4800
+Wire Wire Line
+	2750 5900 3550 5900
+Connection ~ 3550 5900
+Wire Wire Line
+	3550 5900 4400 5900
+Connection ~ 3550 6950
+Wire Wire Line
+	3550 6950 4400 6950
+Wire Wire Line
+	2650 6950 3550 6950
+Wire Wire Line
+	3150 6200 3550 6200
+Connection ~ 3150 6200
+Wire Wire Line
+	3150 6200 3150 7300
+Wire Wire Line
+	3550 5150 3150 5150
+Wire Wire Line
+	3150 4050 3150 5150
+Connection ~ 3150 5150
+Wire Wire Line
+	3150 5150 3150 6200
+Wire Wire Line
+	4050 4050 4050 5150
+Connection ~ 4050 4050
+Connection ~ 4050 5150
+Wire Wire Line
+	4050 5150 4050 6200
+Connection ~ 3550 3700
+Wire Wire Line
+	3550 3700 4400 3700
+Connection ~ 4400 3700
+Wire Wire Line
+	4400 3700 5250 3700
+Connection ~ 5250 3700
+Wire Wire Line
+	5250 3700 6100 3700
+Connection ~ 6100 3700
+Wire Wire Line
+	6100 3700 6950 3700
+Connection ~ 6950 3700
+Wire Wire Line
+	6950 3700 7800 3700
+Connection ~ 7800 3700
+Wire Wire Line
+	7800 3700 8650 3700
+Connection ~ 8650 3700
+Wire Wire Line
+	8650 3700 9500 3700
+Connection ~ 9500 3700
+Wire Wire Line
+	9500 3700 10350 3700
+Connection ~ 10350 3700
+Wire Wire Line
+	10350 3700 11200 3700
+Connection ~ 11200 3700
+Wire Wire Line
+	11200 3700 12050 3700
+Connection ~ 4050 6200
+Wire Wire Line
+	2550 8050 3550 8050
+Connection ~ 3550 8050
+Text Notes 8650 1750 0    60   ~ 0
+Matrix
+$Sheet
+S 3500 9150 500  150 
+U 609BAECC
+F0 "Pocket Reform Keyboard MCU" 50
+F1 "pocket-reform-keyboard-mcu.sch" 50
+$EndSheet
+$EndSCHEMATC
