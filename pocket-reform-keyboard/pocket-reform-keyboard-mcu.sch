@@ -101,8 +101,6 @@ Text GLabel 4450 5000 2    60   Input ~ 0
 ROW4
 Text GLabel 4450 4900 2    60   Input ~ 0
 ROW5
-Text GLabel 4450 4700 2    60   Input ~ 0
-ROW6
 Text GLabel 4450 4800 2    60   Input ~ 0
 COL1
 Text GLabel 4450 6000 2    60   Input ~ 0
@@ -111,19 +109,19 @@ Text GLabel 4450 5300 2    60   Input ~ 0
 COL3
 Text GLabel 4450 4100 2    60   Input ~ 0
 COL4
-Text GLabel 4450 3400 2    60   Input ~ 0
+Text GLabel 4450 4000 2    60   Input ~ 0
 COL5
-Text GLabel 4450 3300 2    60   Input ~ 0
+Text GLabel 4450 4700 2    60   Input ~ 0
 COL6
-Text GLabel 4450 3200 2    60   Input ~ 0
+Text GLabel 4450 5900 2    60   Input ~ 0
 COL7
-Text GLabel 4450 3100 2    60   Input ~ 0
+Text GLabel 4450 5800 2    60   Input ~ 0
 COL8
-Text GLabel 4450 5500 2    60   Input ~ 0
+Text GLabel 4450 5700 2    60   Input ~ 0
 COL9
 Text GLabel 4450 5600 2    60   Input ~ 0
 COL10
-Text GLabel 4450 5700 2    60   Input ~ 0
+Text GLabel 4450 5500 2    60   Input ~ 0
 COL11
 $Comp
 L Device:R_Small R5
@@ -934,7 +932,8 @@ Wire Wire Line
 	1900 2200 2100 2200
 Wire Wire Line
 	1550 2200 1700 2200
-NoConn ~ 4450 4000
-NoConn ~ 4450 5900
-NoConn ~ 4450 5800
+NoConn ~ 4450 3400
+NoConn ~ 4450 3300
+NoConn ~ 4450 3200
+NoConn ~ 4450 3100
 $EndSCHEMATC
