@@ -4,12 +4,12 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 2
-Title ""
-Date ""
-Rev ""
-Comp ""
-Comment1 ""
-Comment2 ""
+Title "MNT Pocket Reform Keyboard"
+Date "2021-05-12"
+Rev "D-1"
+Comp "MNT Research GmbH"
+Comment1 "Lukas F. Hartmann"
+Comment2 "CERN OHL-S 2.0"
 Comment3 ""
 Comment4 ""
 $EndDescr
@@ -303,22 +303,6 @@ Wire Wire Line
 	3100 4400 3100 4550
 Wire Wire Line
 	3750 6400 3750 6500
-$Comp
-L reform2-keyboard-rescue:ATmega32U4-AU-MCU_Microchip_ATmega U1
-U 1 1 5A21306C
-P 3850 4600
-AR Path="/5A21306C" Ref="U1"  Part="1" 
-AR Path="/5A2069AE/5A21306C" Ref="U1"  Part="1" 
-AR Path="/609BAECC/5A21306C" Ref="U2"  Part="1" 
-F 0 "U2" H 4100 2850 50  0000 C CNN
-F 1 "ATMEGA32U4-AU" H 4350 2750 50  0000 C CNN
-F 2 "Package_QFP:TQFP-44_10x10mm_P0.8mm" H 3850 4600 50  0001 C CIN
-F 3 "" H 4950 5700 50  0001 C CNN
-F 4 "Microchip" H 3850 4600 50  0001 C CNN "Manufacturer"
-F 5 "ATMEGA32U4-AU" H 3850 4600 50  0001 C CNN "Manufacturer_No"
-	1    3850 4600
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	3850 6400 3750 6400
 Connection ~ 3750 6400
@@ -443,7 +427,7 @@ U 1 1 5CFAC2C0
 P 3100 7150
 F 0 "H3" H 3200 7199 50  0000 L CNN
 F 1 "MH3" H 3200 7108 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2_Pad" H 3100 7150 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 3100 7150 50  0001 C CNN
 F 3 "~" H 3100 7150 50  0001 C CNN
 	1    3100 7150
 	1    0    0    -1  
@@ -454,7 +438,7 @@ U 1 1 5CFAC2CA
 P 3450 7150
 F 0 "H4" H 3550 7199 50  0000 L CNN
 F 1 "MH4" H 3550 7108 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2_Pad" H 3450 7150 50  0001 C CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 3450 7150 50  0001 C CNN
 F 3 "~" H 3450 7150 50  0001 C CNN
 	1    3450 7150
 	1    0    0    -1  
@@ -487,20 +471,9 @@ U 1 1 5CFBB66E
 P 4750 7150
 F 0 "GFX1" H 4850 7196 50  0000 L CNN
 F 1 "MNT" H 4850 7105 50  0000 L CNN
-F 2 "reform2-keyboard:mntreform" H 4750 7150 50  0001 C CNN
+F 2 "footprints:pocket-reform" H 4750 7150 50  0001 C CNN
 F 3 "~" H 4750 7150 50  0001 C CNN
 	1    4750 7150
-	1    0    0    -1  
-$EndComp
-$Comp
-L Mechanical:MountingHole GFX2
-U 1 1 5CFBBDCD
-P 5250 7150
-F 0 "GFX2" H 5350 7196 50  0000 L CNN
-F 1 "MNT" H 5350 7105 50  0000 L CNN
-F 2 "reform2-keyboard:mntreform" H 5250 7150 50  0001 C CNN
-F 3 "~" H 5250 7150 50  0001 C CNN
-	1    5250 7150
 	1    0    0    -1  
 $EndComp
 Text Label 3050 4100 0    60   ~ 0
@@ -651,8 +624,6 @@ Text GLabel 4450 4400 2    60   Output ~ 0
 DISP_SDA
 Text GLabel 7850 5750 0    60   Input ~ 0
 UART_TX
-Text GLabel 4450 3800 2    60   Output ~ 0
-PWM
 Text GLabel 10100 5900 0    60   Input ~ 0
 DISP_SCL
 Text GLabel 10100 5800 0    60   Input ~ 0
@@ -843,17 +814,6 @@ F 5 "S4B-PH-SM4-TB(LF)(SN)" H 6800 5650 50  0001 C CNN "Manufacturer_No"
 $EndComp
 Wire Wire Line
 	6150 5550 6400 5550
-$Comp
-L Mechanical:MountingHole GFX3
-U 1 1 5FA5BF13
-P 5750 7150
-F 0 "GFX3" H 5850 7196 50  0000 L CNN
-F 1 "MNT" H 5850 7105 50  0000 L CNN
-F 2 "reform2-keyboard:mntreform-keyboard-badge" H 5750 7150 50  0001 C CNN
-F 3 "~" H 5750 7150 50  0001 C CNN
-	1    5750 7150
-	1    0    0    -1  
-$EndComp
 Text Notes 7450 5200 0    60   ~ 0
 To SYSCTL
 Wire Wire Line
@@ -932,8 +892,116 @@ Wire Wire Line
 	1900 2200 2100 2200
 Wire Wire Line
 	1550 2200 1700 2200
-NoConn ~ 4450 3400
-NoConn ~ 4450 3300
-NoConn ~ 4450 3200
 NoConn ~ 4450 3100
+Wire Wire Line
+	4450 3400 5000 3400
+$Comp
+L Device:R_Small R11
+U 1 1 60AFFC3D
+P 5100 3400
+F 0 "R11" V 5200 3500 50  0000 C CNN
+F 1 "22" V 5200 3350 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 5100 3400 50  0001 C CNN
+F 3 "~" H 5100 3400 50  0001 C CNN
+	1    5100 3400
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R9
+U 1 1 60B0BD53
+P 5100 3100
+F 0 "R9" V 5000 3200 50  0000 C CNN
+F 1 "220" V 5000 3050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 5100 3100 50  0001 C CNN
+F 3 "~" H 5100 3100 50  0001 C CNN
+	1    5100 3100
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R10
+U 1 1 60B0CC54
+P 5100 3200
+F 0 "R10" V 5200 3300 50  0000 C CNN
+F 1 "22" V 5200 3150 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 5100 3200 50  0001 C CNN
+F 3 "~" H 5100 3200 50  0001 C CNN
+	1    5100 3200
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED_RGBA D56
+U 1 1 60B3A329
+P 6200 3300
+F 0 "D56" H 6200 3797 50  0000 C CNN
+F 1 "LED_RGBA" H 6200 3706 50  0000 C CNN
+F 2 "footprints:LED_150080M153000" H 6200 3250 50  0001 C CNN
+F 3 "~" H 6200 3250 50  0001 C CNN
+	1    6200 3300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 3400 5600 3400
+Wire Wire Line
+	5600 3400 5600 3500
+Wire Wire Line
+	5600 3500 6000 3500
+$Comp
+L power:+3V3 #PWR0101
+U 1 1 60B43FF3
+P 6600 2950
+F 0 "#PWR0101" H 6600 2800 50  0001 C CNN
+F 1 "+3V3" H 6615 3123 50  0000 C CNN
+F 2 "" H 6600 2950 50  0001 C CNN
+F 3 "" H 6600 2950 50  0001 C CNN
+	1    6600 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6400 3300 6600 3300
+Wire Wire Line
+	6600 3300 6600 2950
+$Comp
+L reform2-keyboard-rescue:ATmega32U4-AU-MCU_Microchip_ATmega U1
+U 1 1 5A21306C
+P 3850 4600
+AR Path="/5A21306C" Ref="U1"  Part="1" 
+AR Path="/5A2069AE/5A21306C" Ref="U1"  Part="1" 
+AR Path="/609BAECC/5A21306C" Ref="U2"  Part="1" 
+F 0 "U2" H 4100 2850 50  0000 C CNN
+F 1 "ATMEGA32U4-AU" H 4350 2750 50  0000 C CNN
+F 2 "Package_QFP:TQFP-44_10x10mm_P0.8mm" H 3850 4600 50  0001 C CIN
+F 3 "" H 4950 5700 50  0001 C CNN
+F 4 "Microchip" H 3850 4600 50  0001 C CNN "Manufacturer"
+F 5 "ATMEGA32U4-AU" H 3850 4600 50  0001 C CNN "Manufacturer_No"
+	1    3850 4600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4700 3300 4450 3300
+Wire Wire Line
+	5200 3100 6000 3100
+Wire Wire Line
+	4700 3100 5000 3100
+Wire Wire Line
+	4700 3100 4700 3300
+Wire Wire Line
+	4450 3200 5000 3200
+Wire Wire Line
+	5200 3200 5750 3200
+Wire Wire Line
+	5750 3200 5750 3300
+Wire Wire Line
+	5750 3300 6000 3300
+NoConn ~ 4450 3800
+$Comp
+L Mechanical:MountingHole GFX2
+U 1 1 60BAEE79
+P 5150 7150
+F 0 "GFX2" H 5250 7196 50  0000 L CNN
+F 1 "MNT" H 5250 7105 50  0000 L CNN
+F 2 "footprints:mpre-badge-d1" H 5150 7150 50  0001 C CNN
+F 3 "~" H 5150 7150 50  0001 C CNN
+	1    5150 7150
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

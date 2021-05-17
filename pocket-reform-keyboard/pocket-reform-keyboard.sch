@@ -4,12 +4,12 @@ EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
 Sheet 1 2
-Title ""
-Date ""
-Rev ""
-Comp ""
-Comment1 ""
-Comment2 ""
+Title "MNT Pocket Reform Keyboard"
+Date "2021-05-12"
+Rev "D-1"
+Comp "MNT Research GmbH"
+Comment1 "Lukas F. Hartmann"
+Comment2 "CERN OHL-S 2.0"
 Comment3 ""
 Comment4 ""
 $EndDescr
