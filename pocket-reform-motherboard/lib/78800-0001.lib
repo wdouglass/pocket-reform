@@ -1,0 +1,40 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#(c) SnapEDA 2016 (snapeda.com)
+#This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA) with Design Exception 1.0
+#
+# 78800-0001
+#
+DEF 78800-0001 P 0 40 Y Y 1 L N
+F0 "P" 0 300 50 H V L BNN
+F1 "78800-0001" 0 -501 50 H V L BNN
+F2 "MOLEX_78800-0001" 0 0 50 H I L BNN
+F3 "" 0 0 50 H I L BNN
+F4 "Molex" 0 0 50 H I L BNN "MANUFACTURER"
+DRAW
+P 2 0 0 10 0 300 0 200 N
+P 2 0 0 10 0 200 0 100 N
+P 2 0 0 10 0 100 0 0 N
+P 2 0 0 10 0 0 0 -100 N
+P 2 0 0 10 0 -100 0 -200 N
+P 2 0 0 10 0 -200 0 -300 N
+P 2 0 0 10 0 -300 0 -400 N
+P 2 0 0 10 0 -400 400 -400 N
+P 2 0 0 10 400 -400 400 300 N
+P 2 0 0 10 400 300 0 300 N
+P 2 0 0 30 0 200 100 200 N
+P 2 0 0 30 0 100 100 100 N
+P 2 0 0 30 0 0 100 0 N
+P 2 0 0 30 0 -100 100 -100 N
+P 2 0 0 30 0 -200 100 -200 N
+P 2 0 0 30 0 -300 100 -300 N
+X C1 1 -200 200 200 R 40 40 0 0 P 
+X C2 2 -200 100 200 R 40 40 0 0 P 
+X C3 3 -200 0 200 R 40 40 0 0 P 
+X C5 5 -200 -100 200 R 40 40 0 0 P 
+X C6 6 -200 -200 200 R 40 40 0 0 P 
+X C7 7 -200 -300 200 R 40 40 0 0 P 
+ENDDRAW
+ENDDEF
+#
+# End Library

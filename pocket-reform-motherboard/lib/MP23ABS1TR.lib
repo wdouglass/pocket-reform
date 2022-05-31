@@ -1,0 +1,27 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#(c) SnapEDA 2016 (snapeda.com)
+#This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA) with Design Exception 1.0
+#
+# MP23ABS1TR
+#
+DEF MP23ABS1TR MK 0 40 Y Y 1 L N
+F0 "MK" -200 325 50 H V L BNN
+F1 "MP23ABS1TR" -200 -400 50 H V L BNN
+F2 "MIC_MP23ABS1TR" 0 0 50 H I L BNN
+F3 "" 0 0 50 H I L BNN
+F4 "STMicroelectronics" 0 0 50 H I L BNN "MANUFACTURER"
+F5 "1.08 mm" 0 0 50 H I L BNN "MAXIMUM_PACKAGE_HEIGHT"
+F6 "5" 0 0 50 H I L BNN "PARTREV"
+F7 "Manufacturer Recommendations" 0 0 50 H I L BNN "STANDARD"
+DRAW
+S -200 -300 200 300 0 0 10 f
+X VDD 5 400 200 200 L 40 40 0 0 W 
+X OUT 1 400 0 200 L 40 40 0 0 O 
+X GND 2 400 -200 200 L 40 40 0 0 W 
+X GND 3 400 -200 200 L 40 40 0 0 W 
+X GND 4 400 -200 200 L 40 40 0 0 W 
+ENDDRAW
+ENDDEF
+#
+# End Library
