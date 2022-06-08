@@ -5,9 +5,9 @@ Group {
 		Shape {
 			appearance Appearance {
 				material Material {
-					diffuseColor 1.0 1.0 1.0
+					diffuseColor 0.1 0.1 0.1
 					ambientIntensity 0.2
-					specularColor 0.8 0.8 0.8
+					specularColor 0.3 0.3 0.3
 					shininess 0.4
 					transparency 0
 				}
