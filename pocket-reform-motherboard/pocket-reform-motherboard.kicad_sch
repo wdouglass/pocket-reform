@@ -15842,6 +15842,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 141cec24-67d2-4fdd-ac77-fa2e9b70b1f2)
   )
+  (text "TODO: TUSB8040 needs up to 1A,\nUSB7002 up to 500mA"
+    (at 200.66 254 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 16a72141-dee7-4682-bf17-4e910cca50b0)
+  )
   (text "PERp1" (at 728.98 579.12 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 178ae27e-edb9-4ffb-bd13-c0a6dd659606)
