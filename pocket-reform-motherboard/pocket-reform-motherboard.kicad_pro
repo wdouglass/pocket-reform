@@ -379,7 +379,7 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "pocket-reform-motherboard.step",
+      "step": "step/pocket-reform-motherboard-with-imx8m.step",
       "vrml": ""
     },
     "page_layout_descr_file": ""
