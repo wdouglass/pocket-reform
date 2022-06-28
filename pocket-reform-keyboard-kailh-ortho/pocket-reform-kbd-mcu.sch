@@ -91,36 +91,32 @@ F 3 "" H 3750 6500 50  0001 C CNN
 $EndComp
 Text GLabel 2950 3100 0    60   Input ~ 0
 RESET
-Text GLabel 4450 3700 2    60   Input ~ 0
-ROW1
-Text GLabel 4450 3600 2    60   Input ~ 0
-ROW2
-Text GLabel 4450 3500 2    60   Input ~ 0
-ROW3
-Text GLabel 4450 5000 2    60   Input ~ 0
-ROW4
-Text GLabel 4450 4900 2    60   Input ~ 0
-ROW5
-Text GLabel 4450 4800 2    60   Input ~ 0
-COL1
-Text GLabel 4450 6000 2    60   Input ~ 0
-COL2
-Text GLabel 4450 5300 2    60   Input ~ 0
-COL3
-Text GLabel 4450 4100 2    60   Input ~ 0
-COL4
 Text GLabel 4450 4000 2    60   Input ~ 0
-COL5
-Text GLabel 4450 4700 2    60   Input ~ 0
-COL6
+ROW1
+Text GLabel 4450 4100 2    60   Input ~ 0
+ROW2
 Text GLabel 4450 5900 2    60   Input ~ 0
-COL7
+ROW3
 Text GLabel 4450 5800 2    60   Input ~ 0
-COL8
+ROW4
 Text GLabel 4450 5700 2    60   Input ~ 0
-COL9
-Text GLabel 4450 5600 2    60   Input ~ 0
-COL10
+ROW5
+Text GLabel 4450 3400 2    60   Input ~ 0
+COL1
+Text GLabel 4450 3300 2    60   Input ~ 0
+COL2
+Text GLabel 4450 3200 2    60   Input ~ 0
+COL3
+Text GLabel 4450 3100 2    60   Input ~ 0
+COL4
+Text GLabel 4450 4700 2    60   Input ~ 0
+COL5
+Text GLabel 4450 4900 2    60   Input ~ 0
+COL6
+Text GLabel 4450 5000 2    60   Input ~ 0
+COL7
+Text GLabel 4450 3500 2    60   Input ~ 0
+COL8
 Text GLabel 4450 5500 2    60   Input ~ 0
 COL11
 $Comp
@@ -760,23 +756,6 @@ F 6 "" H 5900 1450 50  0001 C CNN "Flags"
 	1    5900 1450
 	-1   0    0    -1  
 $EndComp
-$Comp
-L Device:C_Small C2
-U 1 1 5F223065
-P 7000 1450
-F 0 "C2" H 7010 1520 50  0000 L CNN
-F 1 "1uF" H 7010 1370 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 7000 1450 50  0001 C CNN
-F 3 "" H 7000 1450 50  0001 C CNN
-F 4 "TDK" H 7000 1450 50  0001 C CNN "Manufacturer"
-F 5 "C1608X8L1C105K080AC" H 7000 1450 50  0001 C CNN "Manufacturer_No"
-F 6 "" H 7000 1450 50  0001 C CNN "Flags"
-	1    7000 1450
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	7000 1350 7000 1300
-Connection ~ 7000 1300
 Wire Wire Line
 	5900 1300 5900 1350
 Connection ~ 5900 1300
@@ -789,10 +768,6 @@ Wire Wire Line
 Connection ~ 6450 1650
 Wire Wire Line
 	6450 1650 6450 1700
-Wire Wire Line
-	6450 1650 7000 1650
-Wire Wire Line
-	7000 1650 7000 1550
 Wire Wire Line
 	6150 5850 6600 5850
 Text GLabel 6600 5750 0    60   Input ~ 0
@@ -892,7 +867,6 @@ Wire Wire Line
 	1900 2200 2100 2200
 Wire Wire Line
 	1550 2200 1700 2200
-NoConn ~ 4450 3100
 $Comp
 L reform2-keyboard-rescue:ATmega32U4-AU-MCU_Microchip_ATmega U1
 U 1 1 5A21306C
@@ -921,10 +895,14 @@ F 3 "~" H 5150 7150 50  0001 C CNN
 	1    5150 7150
 	1    0    0    -1  
 $EndComp
-Text GLabel 4450 3800 2    60   Input ~ 0
+Text GLabel 4450 5600 2    60   Input ~ 0
 COL12
 Text Notes 5450 4050 0    60   ~ 0
 TODO: check wakeup IRQs
 Text Notes 5450 3850 0    60   ~ 0
 TODO: backlight PWM?!
+Text GLabel 4450 3600 2    60   Input ~ 0
+COL9
+Text GLabel 4450 3700 2    60   Input ~ 0
+COL10
 $EndSCHEMATC
