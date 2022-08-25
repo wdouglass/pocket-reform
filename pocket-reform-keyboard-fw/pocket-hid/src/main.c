@@ -81,14 +81,39 @@ static uint8_t pressed_scancodes[MAX_SCANCODES] = {0,0,0,0,0,0};
 static int pressed_keys = 0;
 
 void hid_task(void);
-void led_task(uint32_t rgb);
+void led_task(uint32_t rgb, int bar_sz);
 void led_core(void);
+int process_keyboard(uint8_t* resulting_scancodes);
 
 #define UART_ID uart1
 #define BAUD_RATE 115200
 #define DATA_BITS 8
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
+
+static char uart_rx_line[128];
+static int uart_rx_i=0;
+
+void on_uart_rx() {
+  while (uart_is_readable(UART_ID)) {
+    char c = uart_getc(UART_ID);
+    if (uart_rx_i<127) {
+      uart_rx_line[uart_rx_i++] = c;
+      uart_rx_line[uart_rx_i] = 0;
+    }
+    if (c == '\n') {
+      // TODO hack
+      if (uart_rx_i>4) {
+        // cut off after 4 digits
+        uart_rx_line[4] = 0;
+        float percentage = ((float)atoi(uart_rx_line))/10.0;
+        float bar_sz = (percentage/100.0)*12;
+        led_task(0x008800, bar_sz);
+      }
+      uart_rx_i = 0;
+    }
+  }
+}
 
 /*------------- MAIN -------------*/
 int main(void)
@@ -103,9 +128,9 @@ int main(void)
   gpio_set_function(PIN_UART_TX, GPIO_FUNC_UART);
   gpio_set_function(PIN_UART_RX, GPIO_FUNC_UART);
   int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
-  //irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
-  //irq_set_enabled(UART_IRQ, true);
-  //uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
+  irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
+  irq_set_enabled(UART_IRQ, true);
+  uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
 
   gpio_pull_up(PIN_COL1);
   gpio_init(PIN_LEDS);
@@ -178,8 +203,6 @@ int main(void)
   /*for (int i=0; i<10; i++) {
     led_task(0x000000);
     }*/
-
-  led_task(0xffff00);
 
   while (1) {
     pressed_keys = process_keyboard(pressed_scancodes);
@@ -336,12 +359,11 @@ int process_keyboard(uint8_t* resulting_scancodes) {
           if (matrix_state[0]) {
             // ESC
             //remote_turn_som_power_on();
-            led_task(0x00ffff);
             uart_puts(UART_ID, "1p\r\n");
             command_sent = 1;
           } else if (matrix_state[11]) {
             //remote_turn_som_power_off();
-            led_task(0x000000);
+            led_task(0x000000, 1);
             uart_puts(UART_ID, "0p\r\n");
             command_sent = 1;
           }
@@ -545,7 +567,7 @@ int led_counter = 0;
 int rgb_channel = 0;
 int rgb_val = 0;
 
-void led_task(uint32_t rgb) {
+void led_task(uint32_t rgb, int bar_sz) {
   int offset = 0;
   uint32_t color = rgb;
 
@@ -555,7 +577,7 @@ void led_task(uint32_t rgb) {
     for (int x=0; x<w; x++) {
       uint32_t bits = color;
 
-      if (x>0 || y>0) bits = 0;
+      if (x>bar_sz || y>0) bits = 0;
 
       for (int i=23; i>=0; i--) {
         if (bits & (1<<23)) {
@@ -612,19 +634,6 @@ void hid_task(void)
 }
 
 void led_core() {
-  for (int i=0; i<10; i++) {
-    sleep_ms(200);
-    led_task(0x00ff00); //rgb_val<<rgb_channel);
-
-    /*rgb_val+=2;
-    if (rgb_val > 0xff) {
-      rgb_val = 0;
-      rgb_channel += 8;
-      if (rgb_channel > 16) {
-        rgb_channel = 0;
-      }
-    }*/
-  }
 }
 
 // Invoked when sent REPORT successfully to host

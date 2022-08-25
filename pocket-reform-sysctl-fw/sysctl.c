@@ -43,6 +43,15 @@
 // https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2762AGV/document_id/9073/
 #define MPS_ADDR  0x5c
 
+#define I2C_TIMEOUT (1000*500)
+
+#define UART_ID uart1
+#define BAUD_RATE 115200
+#define DATA_BITS 8
+#define STOP_BITS 1
+#define PARITY    UART_PARITY_NONE
+
+
 void i2c_scan() {
   printf("\nI2C Scan\n");
   printf("   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
@@ -136,6 +145,24 @@ float max_word_to_pack_mv(uint16_t w)
 float max_word_to_ma(uint16_t w)
 {
   float result = ((float)w)*0.3125;
+  return result;
+}
+
+float max_word_to_time(uint16_t w)
+{
+  float result = ((float)w)*5.625;
+  return result;
+}
+
+float max_word_to_cap(uint16_t w)
+{
+  float result = ((float)w)*1.0; // depends on Rsense, 1.0 @ 5mohms. otherwise 5.0μVh / Rsense
+  return result;
+}
+
+float max_word_to_percentage(uint16_t w)
+{
+  float result = ((float)w)*0.00390625;
   return result;
 }
 
@@ -456,6 +483,13 @@ void max_dump() {
   float temp3 = ((float)((int16_t)max_read_word_100(0x38)))*(1.0/256.0);
   float temp4 = ((float)((int16_t)max_read_word_100(0x37)))*(1.0/256.0);
 
+  float rep_capacity = max_word_to_cap(max_read_word(0x05));
+  float rep_percentage = max_word_to_percentage(max_read_word(0x06));
+  float rep_age = max_word_to_percentage(max_read_word(0x07));
+  float rep_full_capacity = max_word_to_cap(max_read_word(0x10));
+  float rep_time_to_empty = max_word_to_time(max_read_word(0x11));
+  float rep_time_to_full = max_word_to_time(max_read_word(0x20));
+
   printf("[pack info]\n");
 
   printf("  comm_stat: %04x\n", comm_stat);
@@ -533,7 +567,28 @@ void max_dump() {
   printf("  cell2: %f\n", cell2);
   printf("  cell3: %f\n", cell3);
   printf("  cell4: %f\n", cell4);
-  printf("  vpack: %f\n  ============\n", vpack);
+  printf("  vpack: %f\n", vpack);
+
+  printf("  rep_capacity: %f mAh\n", rep_capacity);
+  printf("  rep_percentage: %f %\n", rep_percentage);
+  printf("  rep_age: %f %\n", rep_age);
+  printf("  rep_full_capacity: %f mAh\n", rep_full_capacity);
+  printf("  rep_time_to_empty: %f s\n", rep_time_to_empty);
+  printf("  rep_time_to_full: %f s\n", rep_time_to_full);
+  printf("  ============\n");
+
+  char report[128];
+  sprintf(report, "%04d %05d %05d %06d %06d\r\n",
+          (int)(rep_percentage*10.0),
+          (int)(rep_capacity),
+          (int)(rep_full_capacity),
+          (int)(rep_time_to_empty),
+          (int)(rep_time_to_full));
+
+  uart_puts(UART_ID, report);
+
+  printf("  report: %s", report);
+  printf("  ============\n");
 }
 
 void turn_som_power_on() {
@@ -565,15 +620,6 @@ void turn_som_power_off() {
   sleep_ms(10);
   gpio_put(PIN_1V1_ENABLE, 0);
 }
-
-#define I2C_TIMEOUT (1000*500)
-
-#define UART_ID uart1
-#define BAUD_RATE 115200
-#define DATA_BITS 8
-#define STOP_BITS 1
-#define PARITY    UART_PARITY_NONE
-
 
 #define ST_EXPECT_DIGIT_0 0
 #define ST_EXPECT_DIGIT_1 1
@@ -797,6 +843,7 @@ int main() {
   gpio_put(PIN_LED_B, 0);
 
   unsigned int t = 0;
+  unsigned int t_report = 0;
 
   int state = 0;
   int request_sent = 0;
@@ -952,7 +999,6 @@ int main() {
         //i2c_scan();
 
         int renegotiate = charger_dump();
-        max_dump();
 
         if (renegotiate) {
           state = 0;
@@ -962,7 +1008,13 @@ int main() {
       }
     }
 
+    if (t_report>2000) {
+      max_dump();
+      t_report = 0;
+    }
+
     t++;
+    t_report++;
   }
 
   return 0;
