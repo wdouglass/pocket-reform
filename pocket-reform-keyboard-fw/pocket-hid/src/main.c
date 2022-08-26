@@ -206,7 +206,7 @@ int main(void)
     }*/
 
   gfx_init(false);
-  gfx_poke_str(0, 0, "Hello Pocket!");
+  gfx_poke_cstr(0, 0, "Hello Pocket!");
   gfx_flush();
 
   while (1) {

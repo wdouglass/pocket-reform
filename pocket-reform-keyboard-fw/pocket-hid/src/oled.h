@@ -70,6 +70,7 @@ struct CharacterMatrix {
 
 void gfx_poke(uint8_t x, uint8_t y, uint8_t c);
 void gfx_poke_str(uint8_t x, uint8_t y, char* str);
+void gfx_poke_cstr(uint8_t x, uint8_t y, const char* str);
 void gfx_clear_invert(void);
 void gfx_invert_row(uint8_t y);
 bool gfx_init(bool rotate);
@@ -82,7 +83,7 @@ void gfx_write_char(uint8_t c);
 void gfx_write(const char *data);
 void gfx_write_P(const char *data);
 void gfx_clear_screen(void);
-void gfx_contrast(int c);
+void gfx_contrast(uint8_t c);
 
 void matrix_clear(struct CharacterMatrix *matrix);
 void matrix_write_char_inner(struct CharacterMatrix *matrix, uint8_t c);

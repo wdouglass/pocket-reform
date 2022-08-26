@@ -12,13 +12,13 @@
 #include <string.h>
 #include "font.c"
 
-int oledbrt = 0;
+uint8_t oledbrt = 0;
 struct CharacterMatrix display;
 
 // Write command sequence.
 // Returns true on success.
 static inline bool _send_cmd1(uint8_t cmd) {
-  char buf[] = {0x00, cmd};
+  uint8_t buf[] = {0x00, cmd};
   i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 2, false);
   return true;
 }
@@ -52,7 +52,7 @@ static void clear_display(void) {
   send_cmd3(PageAddr, 0, (DisplayHeight / 8) - 1);
   send_cmd3(ColumnAddr, 0, DisplayWidth - 1);
 
-  char buf[1 + MatrixRows * DisplayWidth];
+  uint8_t buf[1 + MatrixRows * DisplayWidth];
 
   buf[0] = 0x40;
   for (int i=0; i<MatrixRows * DisplayWidth; i++) {
@@ -131,15 +131,15 @@ done:
 }
 
 void gfx_clear(void) {
-  for (int y=0; y<4; y++) {
-    for (int x=0; x<21; x++) {
-      gfx_poke(x,y,' ');
+  for (uint8_t y=0; y<4; y++) {
+    for (uint8_t x=0; x<21; x++) {
+      gfx_poke(x, y, ' ');
     }
   }
   gfx_clear_invert();
 }
 
-void gfx_contrast(int c) {
+void gfx_contrast(uint8_t c) {
   send_cmd2(SetContrast, c);
 done:
   return;
@@ -164,7 +164,7 @@ void matrix_write_char(struct CharacterMatrix *matrix, uint8_t c) {
   if (c == '\n') {
     // Clear to end of line from the cursor and then move to the
     // start of the next line
-    uint8_t cursor_col = (matrix->cursor - &matrix->display[0][0]) % MatrixCols;
+    int cursor_col = (matrix->cursor - &matrix->display[0][0]) % MatrixCols;
 
     while (cursor_col++ < MatrixCols) {
       matrix_write_char_inner(matrix, ' ');
@@ -180,16 +180,21 @@ void gfx_poke(uint8_t x, uint8_t y, uint8_t c) {
 }
 
 void gfx_poke_str(uint8_t x, uint8_t y, char* str) {
-  int len = strlen(str);
+  int len = (int)strlen(str);
+  if (len<1) return;
   if (len>21) len = 21;
   // clip
-  if (y<0 || y>3) return;
+  if (y>3) return;
 
   for (int xx=x; xx<x+len && xx<21; xx++) {
-    if (xx>=0 && xx<21) {
+    if (xx<21) {
       display.display[y][xx] = (uint8_t)str[xx-x];
     }
   }
+}
+
+void gfx_poke_cstr(uint8_t x, uint8_t y, const char* str) {
+  gfx_poke_str(x, y, strdup(str));
 }
 
 void gfx_write_char(uint8_t c) {
@@ -240,16 +245,16 @@ void gfx_clear_screen(void) {
 }
 
 void gfx_clear_invert(void) {
-  for (int y=0;y<4;y++) {
-    for (int x=0;x<21;x++) {
+  for (int y=0; y<4; y++) {
+    for (int x=0; x<21; x++) {
       display.invert[y][x] = 0;
     }
   }
 }
 
 void gfx_invert_row(uint8_t y) {
-  if (y<0 || y>3) return;
-  for (int x=0;x<21;x++) {
+  if (y>3) return;
+  for (int x=0; x<21; x++) {
     display.invert[y][x] = 1;
   }
 }
@@ -261,7 +266,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
   send_cmd3(PageAddr, 0, MatrixRows - 1);
   send_cmd3(ColumnAddr, 0, (MatrixCols * FontWidth) - 1);
 
-  char buf[1 + MatrixRows * DisplayWidth];
+  uint8_t buf[1 + MatrixRows * DisplayWidth];
   buf[0] = 0x40;
 
   int i = 1;
@@ -310,7 +315,10 @@ void oled_brightness_inc(void) {
 }
 
 void oled_brightness_dec(void) {
-  oledbrt-=10;
-  if (oledbrt<0) oledbrt = 0;
+  if (oledbrt<10) {
+    oledbrt = 0;
+  } else {
+    oledbrt-=10;
+  }
   gfx_contrast(oledbrt);
 }
