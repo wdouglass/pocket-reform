@@ -263,7 +263,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
   send_cmd3(PageAddr, 0, MatrixRows - 1);
   send_cmd3(ColumnAddr, 0, (MatrixCols * FontWidth) - 1);
 
-  uint8_t buf[1 + MatrixRows * MatrixCols];
+  uint8_t buf[1 + MatrixRows * MatrixCols * FontWidth];
   buf[0] = 0x40;
 
   int i = 1;
@@ -279,7 +279,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
       }
     }
   }
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * MatrixCols, false);
+  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * MatrixCols * FontWidth, false);
 
   matrix->dirty = false;
 done:
