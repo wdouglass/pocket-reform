@@ -16,7 +16,6 @@ uint8_t oledbrt = 0;
 struct CharacterMatrix display;
 
 // Write command sequence.
-// Returns true on success.
 static inline bool _send_cmd1(uint8_t cmd) {
   uint8_t buf[] = {0x00, cmd};
   i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 2, false);
@@ -24,7 +23,6 @@ static inline bool _send_cmd1(uint8_t cmd) {
 }
 
 // Write 2-byte command sequence.
-// Returns true on success
 static inline bool _send_cmd2(uint8_t cmd, uint8_t opr) {
   _send_cmd1(cmd);
   _send_cmd1(opr);
@@ -32,7 +30,6 @@ static inline bool _send_cmd2(uint8_t cmd, uint8_t opr) {
 }
 
 // Write 3-byte command sequence.
-// Returns true on success
 static inline bool _send_cmd3(uint8_t cmd, uint8_t opr1, uint8_t opr2) {
   _send_cmd1(cmd);
   _send_cmd1(opr1);
@@ -266,7 +263,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
   send_cmd3(PageAddr, 0, MatrixRows - 1);
   send_cmd3(ColumnAddr, 0, (MatrixCols * FontWidth) - 1);
 
-  uint8_t buf[1 + MatrixRows * DisplayWidth];
+  uint8_t buf[1 + MatrixRows * MatrixCols];
   buf[0] = 0x40;
 
   int i = 1;
@@ -282,7 +279,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
       }
     }
   }
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * DisplayWidth, false);
+  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * MatrixCols, false);
 
   matrix->dirty = false;
 done:
