@@ -38,6 +38,7 @@
 #include "hardware/irq.h"
 
 #include "usb_descriptors.h"
+#include "oled.h"
 
 #define KBD_VARIANT_QWERTY_US
 #define KBD_COLS 12
@@ -203,6 +204,10 @@ int main(void)
   /*for (int i=0; i<10; i++) {
     led_task(0x000000);
     }*/
+
+  gfx_init(false);
+  gfx_poke_str(0, 0, "Hello Pocket!");
+  gfx_flush();
 
   while (1) {
     pressed_keys = process_keyboard(pressed_scancodes);
