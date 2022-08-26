@@ -106,9 +106,9 @@ void on_uart_rx() {
       if (uart_rx_i>4) {
         // cut off after 4 digits
         uart_rx_line[4] = 0;
-        float percentage = ((float)atoi(uart_rx_line))/10.0;
-        float bar_sz = (percentage/100.0)*12;
-        led_task(0x008800, bar_sz);
+        float percentage = ((float)atoi(uart_rx_line))/(float)10.0;
+        float bar_sz = (percentage/(float)100.0)*12;
+        led_task(0x008800, (int)bar_sz);
       }
       uart_rx_i = 0;
     }
@@ -127,7 +127,7 @@ int main(void)
   uart_set_fifo_enabled(UART_ID, true);
   gpio_set_function(PIN_UART_TX, GPIO_FUNC_UART);
   gpio_set_function(PIN_UART_RX, GPIO_FUNC_UART);
-  int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+  unsigned int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
   irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
   irq_set_enabled(UART_IRQ, true);
   uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
@@ -192,7 +192,7 @@ int main(void)
 
   bi_decl(bi_2pins_with_func(PIN_SDA, PIN_SCL, GPIO_FUNC_I2C));
 
-  char buf[] = {0x7f, 0x00, 0x00, 0x00};
+  unsigned char buf[] = {0x7f, 0x00, 0x00, 0x00};
   i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
 
   buf[0] = 0x05;
@@ -317,8 +317,8 @@ int process_keyboard(uint8_t* resulting_scancodes) {
 
     // check input COLs
     for (int x = 0; x < KBD_COLS; x++) {
-      uint16_t keycode;
-      uint16_t loc = y*KBD_COLS+x;
+      uint8_t keycode;
+      int loc = y*KBD_COLS+x;
       keycode = active_matrix[loc];
       uint8_t  pressed = 0;
       uint8_t  debounced_pressed = 0;
@@ -339,7 +339,7 @@ int process_keyboard(uint8_t* resulting_scancodes) {
       }
 
       // shift new state as bit into debounce "register"
-      matrix_debounce[loc] = (matrix_debounce[loc]<<1)|pressed;
+      matrix_debounce[loc] = (uint8_t)(matrix_debounce[loc]<<1)|pressed;
 
       // if unclear state, we need to keep the last state of the key
       if (matrix_debounce[loc] == 0x00) {
@@ -443,9 +443,9 @@ int process_keyboard(uint8_t* resulting_scancodes) {
 }
 
 
-uint8_t prev_buttons = 0;
-uint8_t scroll_toggle = 0;
-uint8_t prev_num_keys = 0;
+int prev_buttons = 0;
+int scroll_toggle = 0;
+int prev_num_keys = 0;
 
 static void send_hid_report(uint8_t report_id)
 {
@@ -469,11 +469,7 @@ static void send_hid_report(uint8_t report_id)
 
     case REPORT_ID_MOUSE:
     {
-      int8_t const delta = 5;
-      int8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
-
-      // no button, right + down, no scroll, no pan
-      //tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, delta, delta, 0, 0);
+      uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
 
       buf[0] = 0x02;
       i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
@@ -484,25 +480,25 @@ static void send_hid_report(uint8_t report_id)
       int btn2 = matrix_state[KBD_COLS*5+7]>0;
       int btn4 = matrix_state[KBD_COLS*5+8]>0;
 
-      uint8_t buttons = btn1 | (btn2<<1) | (btn4<<2);
+      int buttons = btn1 | (btn2<<1) | (btn4<<2);
 
       if (buf[0] & 0xf0) {
         buf[0] = 0x03;
         i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
         i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
 
-        int8_t nx = buf[0];
-        int8_t ny = buf[1];
+        int8_t nx = (int8_t)buf[0];
+        int8_t ny = (int8_t)buf[1];
 
         // no button, right + down, no scroll pan
         if (btn3 || scroll_toggle) {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, buttons, 0, 0, 2*ny, -2*nx);
+          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 2*ny, -2*nx);
         } else {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, buttons, -2*nx, -2*ny, 0, 0);
+          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*nx, -2*ny, 0, 0);
         }
       } else {
         //if (buttons != prev_buttons) {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, buttons, 0, 0, 0, 0);
+          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
           //}
       }
 
@@ -568,7 +564,6 @@ int rgb_channel = 0;
 int rgb_val = 0;
 
 void led_task(uint32_t rgb, int bar_sz) {
-  int offset = 0;
   uint32_t color = rgb;
 
   for (int y=0; y<6; y++) {
@@ -672,6 +667,7 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_t
 void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
   (void) instance;
+  (void) buffer;
 
   if (report_type == HID_REPORT_TYPE_OUTPUT)
   {
