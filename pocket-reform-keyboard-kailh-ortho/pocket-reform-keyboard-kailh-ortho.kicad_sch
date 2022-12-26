@@ -4827,9 +4827,6 @@
     (path "/00000000-0000-0000-0000-00006195bbbb/a1d27006-ba37-473c-83f6-d3d748fe6796"
       (reference "#PWR02") (unit 1) (value "+3V3") (footprint "")
     )
-    (path "/00000000-0000-0000-0000-00006195bbbb/e45162ef-6a1c-4328-a923-171dbcd604d5"
-      (reference "#PWR03") (unit 1) (value "+5V") (footprint "")
-    )
     (path "/00000000-0000-0000-0000-00006195bbbb/4e6425d8-44e7-49a0-b78d-5caf3f578917"
       (reference "#PWR04") (unit 1) (value "~") (footprint "")
     )
@@ -4952,6 +4949,9 @@
     )
     (path "/00000000-0000-0000-0000-00006195bbbb/00000000-0000-0000-0000-0000609cdae0"
       (reference "#PWR044") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/00000000-0000-0000-0000-00006195bbbb/4b29c389-85ca-413a-8ade-5de7d240f82f"
+      (reference "#PWR0101") (unit 1) (value "+3V3") (footprint "")
     )
     (path "/00000000-0000-0000-0000-00006195bbbb/e820f1b3-2e7e-445a-b172-c1b787bfa577"
       (reference "C1") (unit 1) (value "0.1uF") (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -5578,7 +5578,7 @@
       (reference "GFX1") (unit 1) (value "MNT") (footprint "footprints:pocket-reform")
     )
     (path "/00000000-0000-0000-0000-00006195bbbb/00000000-0000-0000-0000-000060baee79"
-      (reference "GFX2") (unit 1) (value "MNT") (footprint "footprints:mpre-badge-d1")
+      (reference "GFX2") (unit 1) (value "MNT") (footprint "footprints:mpre-keyboard-badge-d2")
     )
     (path "/00000000-0000-0000-0000-00006195bbbb/00000000-0000-0000-0000-00005cfab6f9"
       (reference "H1") (unit 1) (value "MH1") (footprint "MountingHole:MountingHole_2.2mm_M2_Pad")
