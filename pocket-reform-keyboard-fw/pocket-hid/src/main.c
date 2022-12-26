@@ -82,7 +82,7 @@ static uint8_t pressed_scancodes[MAX_SCANCODES] = {0,0,0,0,0,0};
 static int pressed_keys = 0;
 
 void hid_task(void);
-void led_task(uint32_t rgb, int bar_sz);
+void led_task(uint32_t rgb);
 void led_core(void);
 int process_keyboard(uint8_t* resulting_scancodes);
 
@@ -95,24 +95,68 @@ int process_keyboard(uint8_t* resulting_scancodes);
 static char uart_rx_line[128];
 static int uart_rx_i=0;
 
+void insert_bat_icon(char* str, int x, float v) {
+  char icon = 0;
+  if (v>=80) {
+    icon = 8;
+  } else if (v>=60) {
+    icon = 6;
+  } else if (v>=40) {
+    icon = 4;
+  } else if (v>=20) {
+    icon = 2;
+  } else {
+    icon = 0;
+  }
+  str[x]   = 4*32+icon;
+  str[x+1] = 4*32+icon+1;
+}
+
 void on_uart_rx() {
   while (uart_is_readable(UART_ID)) {
     char c = uart_getc(UART_ID);
     if (uart_rx_i<127) {
       uart_rx_line[uart_rx_i++] = c;
       uart_rx_line[uart_rx_i] = 0;
+    } else {
+      uart_rx_i = 0;
     }
     if (c == '\n') {
       // TODO hack
-      if (uart_rx_i>4) {
+      if (uart_rx_i>6) {
+	gfx_clear();
+	//gfx_poke_str(0, 3, uart_rx_line);
         // cut off after 4 digits
         uart_rx_line[4] = 0;
         float percentage = ((float)atoi(uart_rx_line))/(float)10.0;
-        float bar_sz = (percentage/(float)100.0)*12;
-        led_task(0x008800, (int)bar_sz);
+
+	char batinfo[32];
+	sprintf(batinfo, "   %.1f%%", (double)percentage);
+	insert_bat_icon(batinfo, 0, percentage);
+	gfx_poke_str(0, 0, batinfo);
+	gfx_flush();
       }
       uart_rx_i = 0;
     }
+  }
+}
+
+void anim_hello(void) {
+  gfx_clear();
+  gfx_on();
+  for (int y=0; y<3; y++) {
+    for (int x=0; x<12; x++) {
+      gfx_poke((uint8_t)(x+4),(uint8_t)(y+1),(uint8_t)((5+y)*32+x));
+    }
+    gfx_flush();
+  }
+  for (uint8_t y=0; y<0xff; y++) {
+    gfx_contrast(y);
+    sleep_ms(0);
+  }
+  for (uint8_t y=0; y<0xff; y++) {
+    gfx_contrast(0xff-y);
+    sleep_ms(0);
   }
 }
 
@@ -129,9 +173,6 @@ int main(void)
   gpio_set_function(PIN_UART_TX, GPIO_FUNC_UART);
   gpio_set_function(PIN_UART_RX, GPIO_FUNC_UART);
   unsigned int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
-  irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
-  irq_set_enabled(UART_IRQ, true);
-  uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
 
   gpio_pull_up(PIN_COL1);
   gpio_init(PIN_LEDS);
@@ -201,13 +242,14 @@ int main(void)
   i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
 
   //multicore_launch_core1(led_core);
-  /*for (int i=0; i<10; i++) {
-    led_task(0x000000);
-    }*/
-
+  
+  led_task(0x000000);
   gfx_init(false);
-  gfx_poke_cstr(0, 0, "Hello Pocket!");
-  gfx_flush();
+  anim_hello();
+
+  irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
+  irq_set_enabled(UART_IRQ, true);
+  uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
 
   while (1) {
     pressed_keys = process_keyboard(pressed_scancodes);
@@ -360,18 +402,62 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         // Is circle key pressed?
         // FIXME HACK
 
-        if (keycode == KEY_COMPOSE && (matrix_state[0] || matrix_state[11]) && !command_sent) {
+        if (keycode == KEY_COMPOSE && (matrix_state[0] 
+				|| matrix_state[1]
+				|| matrix_state[2]
+				|| matrix_state[3]
+				|| matrix_state[4]
+				|| matrix_state[5]
+				|| matrix_state[6]
+				|| matrix_state[7]
+				|| matrix_state[8]
+				|| matrix_state[11]
+				) && !command_sent) {
           if (matrix_state[0]) {
             // ESC
             //remote_turn_som_power_on();
             uart_puts(UART_ID, "1p\r\n");
+	    led_task(0x010101);
             command_sent = 1;
+            //anim_hello();
           } else if (matrix_state[11]) {
             //remote_turn_som_power_off();
-            led_task(0x000000, 1);
+            led_task(0x000000);
             uart_puts(UART_ID, "0p\r\n");
             command_sent = 1;
-          }
+          } else if (matrix_state[1]) {
+            // 1
+	    led_task(0x444444);
+            command_sent = 1;
+          } else if (matrix_state[2]) {
+            // 2
+	    led_task(0x222222);
+            command_sent = 1;
+          } else if (matrix_state[3]) {
+            // 3
+	    led_task(0x111111);
+            command_sent = 1;
+          } else if (matrix_state[4]) {
+            // 4
+	    led_task(0x010101);
+            command_sent = 1;
+          } else if (matrix_state[5]) {
+            // 5
+	    led_task(0x220022);
+            command_sent = 1;
+          } else if (matrix_state[6]) {
+            // 6
+	    led_task(0x110011);
+            command_sent = 1;
+          } else if (matrix_state[7]) {
+            // 7
+	    led_task(0x000022);
+            command_sent = 1;
+          } else if (matrix_state[8]) {
+            // 8
+	    led_task(0x000000);
+            command_sent = 1;
+	  }
         } else if (keycode == HID_KEY_EXECUTE) {
           fn_key = 1;
           //active_matrix = matrix_fn;
@@ -477,8 +563,11 @@ static void send_hid_report(uint8_t report_id)
       uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
 
       buf[0] = 0x02;
-      i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
-      i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 1, false);
+
+      i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
+      i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 1, false, make_timeout_time_ms(2));
+      //i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
+      //i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 1, false);
 
       int btn3 = matrix_state[KBD_COLS*5+3]>0;
       int btn1 = matrix_state[KBD_COLS*5+4]>0;
@@ -489,8 +578,10 @@ static void send_hid_report(uint8_t report_id)
 
       if (buf[0] & 0xf0) {
         buf[0] = 0x03;
-        i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
-        i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
+        //i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
+        //i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
+        i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
+        i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 2, false, make_timeout_time_ms(2));
 
         int8_t nx = (int8_t)buf[0];
         int8_t ny = (int8_t)buf[1];
@@ -568,43 +659,43 @@ int led_counter = 0;
 int rgb_channel = 0;
 int rgb_val = 0;
 
-void led_task(uint32_t rgb, int bar_sz) {
+void led_task(uint32_t rgb) {
   uint32_t color = rgb;
 
-  for (int y=0; y<6; y++) {
-    int w = 12;
-    if (y==5) w = 4;
-    for (int x=0; x<w; x++) {
-      uint32_t bits = color;
+  for (int j=0; j<4; j++) {
+	  for (int y=0; y<6; y++) {
+	    int w = 12;
+	    if (y==5) w = 4;
+	    for (int x=0; x<w; x++) {
+	      uint32_t bits = color;
 
-      if (x>bar_sz || y>0) bits = 0;
-
-      for (int i=23; i>=0; i--) {
-        if (bits & (1<<23)) {
-          // one
-          gpio_put(PIN_LEDS, 1);
-          delay300ns();
-          delay300ns();
-          delay300ns();
-          gpio_put(PIN_LEDS, 0);
-          // ~600ms delay
-          delay300ns();
-          delay300ns();
-        } else {
-          // zero
-          gpio_put(PIN_LEDS, 1);
-          delay300ns();
-          gpio_put(PIN_LEDS, 0);
-          // ~1.2ms delay
-          delay300ns();
-          delay300ns();
-          delay300ns();
-          delay300ns();
-          //delay300ns();
-        }
-        bits <<= 1;
-      }
-    }
+	      for (int i=23; i>=0; i--) {
+		if (bits & (1<<23)) {
+		  // one
+		  gpio_put(PIN_LEDS, 1);
+		  delay300ns();
+		  delay300ns();
+		  delay300ns();
+		  gpio_put(PIN_LEDS, 0);
+		  // ~600ms delay
+		  delay300ns();
+		  delay300ns();
+		} else {
+		  // zero
+		  gpio_put(PIN_LEDS, 1);
+		  delay300ns();
+		  gpio_put(PIN_LEDS, 0);
+		  // ~1.2ms delay
+		  delay300ns();
+		  delay300ns();
+		  delay300ns();
+		  delay300ns();
+		  //delay300ns();
+		}
+		bits <<= 1;
+	      }
+	    }
+	  }
   }
 }
 

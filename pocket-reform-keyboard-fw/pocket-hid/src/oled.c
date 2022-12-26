@@ -12,13 +12,15 @@
 #include <string.h>
 #include "font.c"
 
+#define OLED_I2C_TIMEOUT 100
+
 uint8_t oledbrt = 0;
 struct CharacterMatrix display;
 
 // Write command sequence.
 static inline bool _send_cmd1(uint8_t cmd) {
   uint8_t buf[] = {0x00, cmd};
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 2, false);
+  i2c_write_blocking_until(i2c0, SSD1306_ADDRESS, buf, 2, false, make_timeout_time_ms(OLED_I2C_TIMEOUT));
   return true;
 }
 
@@ -56,7 +58,7 @@ static void clear_display(void) {
     buf[1+i] = 0;
   }
 
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * DisplayWidth, false);
+  i2c_write_blocking_until(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * DisplayWidth, false, make_timeout_time_ms(OLED_I2C_TIMEOUT));
   display.dirty = false;
 done:
   return;
@@ -279,7 +281,7 @@ void matrix_render(struct CharacterMatrix *matrix) {
       }
     }
   }
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * MatrixCols * FontWidth, false);
+  i2c_write_blocking_until(i2c0, SSD1306_ADDRESS, buf, 1 + MatrixRows * MatrixCols * FontWidth, false, make_timeout_time_ms(OLED_I2C_TIMEOUT));
 
   matrix->dirty = false;
 done:
@@ -295,7 +297,7 @@ void matrix_render_direct(uint8_t* bitmap) {
   send_cmd3(ColumnAddr, 0, (MatrixCols * FontWidth) - 1);
 
   bitmap[0] = 0x40;
-  i2c_write_blocking(i2c0, SSD1306_ADDRESS, bitmap, 1 + MatrixRows * DisplayWidth, false);
+  i2c_write_blocking_until(i2c0, SSD1306_ADDRESS, bitmap, 1 + MatrixRows * DisplayWidth, false, make_timeout_time_ms(OLED_I2C_TIMEOUT));
 
 done:
   return;
