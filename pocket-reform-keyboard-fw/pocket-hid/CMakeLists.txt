@@ -28,7 +28,7 @@ target_include_directories(${PROJECT} PUBLIC
 # in hw/bsp/FAMILY/family.cmake for details.
 family_configure_device_example(${PROJECT})
 
-target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c)
+target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c hardware_pio)
 
 target_compile_definitions(${PROJECT} PUBLIC
 	PICO_XOSC_STARTUP_DELAY_MULTIPLIER=64

@@ -40,6 +40,8 @@
 #include "usb_descriptors.h"
 #include "oled.h"
 
+#include "ws2812.pio.h"
+
 #define KBD_VARIANT_QWERTY_US
 #define KBD_COLS 12
 #define KBD_ROWS 6
@@ -81,9 +83,15 @@
 static uint8_t pressed_scancodes[MAX_SCANCODES] = {0,0,0,0,0,0};
 static int pressed_keys = 0;
 
+static volatile uint32_t led_value = 0;
+
 void hid_task(void);
+void led_set(uint32_t rgb);
 void led_task(uint32_t rgb);
-void led_core(void);
+void led_mod_hue(int d);
+void led_mod_brightness(int d);
+void led_set_brightness(int b);
+void led_cycle_hue();
 int process_keyboard(uint8_t* resulting_scancodes);
 
 #define UART_ID uart1
@@ -124,17 +132,17 @@ void on_uart_rx() {
     if (c == '\n') {
       // TODO hack
       if (uart_rx_i>6) {
-	gfx_clear();
-	//gfx_poke_str(0, 3, uart_rx_line);
+        gfx_clear();
+        //gfx_poke_str(0, 3, uart_rx_line);
         // cut off after 4 digits
         uart_rx_line[4] = 0;
         float percentage = ((float)atoi(uart_rx_line))/(float)10.0;
 
-	char batinfo[32];
-	sprintf(batinfo, "   %.1f%%", (double)percentage);
-	insert_bat_icon(batinfo, 0, percentage);
-	gfx_poke_str(0, 0, batinfo);
-	gfx_flush();
+        char batinfo[32];
+        sprintf(batinfo, "   %.1f%%", (double)percentage);
+        insert_bat_icon(batinfo, 0, percentage);
+        gfx_poke_str(0, 0, batinfo);
+        gfx_flush();
       }
       uart_rx_i = 0;
     }
@@ -241,9 +249,14 @@ int main(void)
   buf[1] = 0x01;
   i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
 
-  //multicore_launch_core1(led_core);
-  
-  led_task(0x000000);
+  PIO pio = pio0;
+  int sm = 0;
+  uint offset = pio_add_program(pio, &ws2812_program);
+
+  ws2812_program_init(pio, sm, offset, PIN_LEDS, 800000, false);
+
+  led_set_brightness(0x80);
+
   gfx_init(false);
   anim_hello();
 
@@ -292,7 +305,7 @@ void tud_resume_cb(void)
 int __attribute__((optimize("Os"))) delay300ns() {
   // ~300ns
   asm volatile(
-               "mov  r0, #6\n"    		// 1 cycle (was 10)
+               "mov  r0, #9\n"    		// 1 cycle (was 10)
                "loop1: sub  r0, r0, #1\n"	// 1 cycle
                "bne   loop1\n"          	// 2 cycles if loop taken, 1 if not
                );
@@ -402,62 +415,23 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         // Is circle key pressed?
         // FIXME HACK
 
-        if (keycode == KEY_COMPOSE && (matrix_state[0] 
-				|| matrix_state[1]
-				|| matrix_state[2]
-				|| matrix_state[3]
-				|| matrix_state[4]
-				|| matrix_state[5]
-				|| matrix_state[6]
-				|| matrix_state[7]
-				|| matrix_state[8]
-				|| matrix_state[11]
+        if (keycode == KEY_COMPOSE &&
+         ( matrix_state[1]
+				|| matrix_state[10]
 				) && !command_sent) {
-          if (matrix_state[0]) {
-            // ESC
+          if (matrix_state[1]) {
+            // 1
             //remote_turn_som_power_on();
-            uart_puts(UART_ID, "1p\r\n");
-	    led_task(0x010101);
+            uart_puts(UART_ID, "\r\n1p\r\n");
+            led_set_brightness(10);
             command_sent = 1;
             //anim_hello();
-          } else if (matrix_state[11]) {
+          } else if (matrix_state[10]) {
             //remote_turn_som_power_off();
-            led_task(0x000000);
-            uart_puts(UART_ID, "0p\r\n");
+            led_set_brightness(0);
+            uart_puts(UART_ID, "\r\n0p\r\n");
             command_sent = 1;
-          } else if (matrix_state[1]) {
-            // 1
-	    led_task(0x444444);
-            command_sent = 1;
-          } else if (matrix_state[2]) {
-            // 2
-	    led_task(0x222222);
-            command_sent = 1;
-          } else if (matrix_state[3]) {
-            // 3
-	    led_task(0x111111);
-            command_sent = 1;
-          } else if (matrix_state[4]) {
-            // 4
-	    led_task(0x010101);
-            command_sent = 1;
-          } else if (matrix_state[5]) {
-            // 5
-	    led_task(0x220022);
-            command_sent = 1;
-          } else if (matrix_state[6]) {
-            // 6
-	    led_task(0x110011);
-            command_sent = 1;
-          } else if (matrix_state[7]) {
-            // 7
-	    led_task(0x000022);
-            command_sent = 1;
-          } else if (matrix_state[8]) {
-            // 8
-	    led_task(0x000000);
-            command_sent = 1;
-	  }
+          }
         } else if (keycode == HID_KEY_EXECUTE) {
           fn_key = 1;
           //active_matrix = matrix_fn;
@@ -592,6 +566,17 @@ static void send_hid_report(uint8_t report_id)
         } else {
           tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*nx, -2*ny, 0, 0);
         }
+
+        // HACK hue/value wheel
+        if (matrix_state[KBD_COLS*4+0]) {
+          if (ny) {
+            led_mod_brightness(ny);
+          }
+          if (nx) {
+            led_mod_hue(nx);
+          }
+        }
+
       } else {
         //if (buttons != prev_buttons) {
           tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
@@ -655,47 +640,15 @@ static void send_hid_report(uint8_t report_id)
   }
 }
 
-int led_counter = 0;
-int rgb_channel = 0;
-int rgb_val = 0;
+void led_task(uint32_t color) {
+  uint32_t pixel_grb = color;
 
-void led_task(uint32_t rgb) {
-  uint32_t color = rgb;
-
-  for (int j=0; j<4; j++) {
-	  for (int y=0; y<6; y++) {
-	    int w = 12;
-	    if (y==5) w = 4;
-	    for (int x=0; x<w; x++) {
-	      uint32_t bits = color;
-
-	      for (int i=23; i>=0; i--) {
-		if (bits & (1<<23)) {
-		  // one
-		  gpio_put(PIN_LEDS, 1);
-		  delay300ns();
-		  delay300ns();
-		  delay300ns();
-		  gpio_put(PIN_LEDS, 0);
-		  // ~600ms delay
-		  delay300ns();
-		  delay300ns();
-		} else {
-		  // zero
-		  gpio_put(PIN_LEDS, 1);
-		  delay300ns();
-		  gpio_put(PIN_LEDS, 0);
-		  // ~1.2ms delay
-		  delay300ns();
-		  delay300ns();
-		  delay300ns();
-		  delay300ns();
-		  //delay300ns();
-		}
-		bits <<= 1;
-	      }
-	    }
-	  }
+  for (int y=0; y<6; y++) {
+    int w = 12;
+    if (y==5) w = 4;
+    for (int x=0; x<w; x++) {
+      pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
+    }
   }
 }
 
@@ -724,8 +677,108 @@ void hid_task(void)
   }
 }
 
-void led_core() {
+int led_brightness = 0;
+int led_hue = 0;
+
+typedef struct RgbColor
+{
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} RgbColor;
+
+typedef struct HsvColor
+{
+    unsigned char h;
+    unsigned char s;
+    unsigned char v;
+} HsvColor;
+
+RgbColor HsvToRgb(HsvColor hsv)
+{
+    RgbColor rgb;
+    unsigned char region, remainder, p, q, t;
+
+    if (hsv.s == 0)
+    {
+        rgb.r = hsv.v;
+        rgb.g = hsv.v;
+        rgb.b = hsv.v;
+        return rgb;
+    }
+
+    region = hsv.h / 43;
+    remainder = (hsv.h - (region * 43)) * 6;
+
+    p = (hsv.v * (255 - hsv.s)) >> 8;
+    q = (hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8;
+    t = (hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region)
+    {
+        case 0:
+            rgb.r = hsv.v; rgb.g = t; rgb.b = p;
+            break;
+        case 1:
+            rgb.r = q; rgb.g = hsv.v; rgb.b = p;
+            break;
+        case 2:
+            rgb.r = p; rgb.g = hsv.v; rgb.b = t;
+            break;
+        case 3:
+            rgb.r = p; rgb.g = q; rgb.b = hsv.v;
+            break;
+        case 4:
+            rgb.r = t; rgb.g = p; rgb.b = hsv.v;
+            break;
+        default:
+            rgb.r = hsv.v; rgb.g = p; rgb.b = q;
+            break;
+    }
+
+    return rgb;
 }
+
+void led_set(uint32_t rgb) {
+  led_task(rgb);
+}
+
+void led_set_hsv() {
+  HsvColor hsv;
+  RgbColor rgb;
+  hsv.h = led_hue;
+  hsv.s = 0xff;
+  hsv.v = led_brightness;
+
+  rgb = HsvToRgb(hsv);
+  led_set((rgb.r<<16)|(rgb.g<<8)|(rgb.b));
+}
+
+void led_mod_brightness(int d) {
+  led_brightness+=d;
+  if (led_brightness>0xff) led_brightness = 0xff;
+  if (led_brightness<0) led_brightness = 0;
+  led_set_hsv();
+}
+
+void led_mod_hue(int d) {
+  led_hue+=d;
+  if (led_hue>0xff) led_hue = 0xff;
+  if (led_hue<0) led_hue = 0;
+  led_set_hsv();
+}
+
+void led_set_brightness(int b) {
+  led_brightness = b;
+  led_set_hsv();
+}
+
+void led_cycle_hue() {
+  led_hue++;
+  if (led_hue>0xff) led_hue = 0;
+  led_set_hsv();
+}
+
 
 // Invoked when sent REPORT successfully to host
 // Application can use this to send the next report
