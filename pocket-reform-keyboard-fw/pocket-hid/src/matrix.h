@@ -34,7 +34,7 @@
   KEY_I,\
   KEY_O,\
   KEY_P,\
-  KEY_BACKSLASH
+  KEY_SEMICOLON
 
 // Fourth row
 #define MATRIX_DEFAULT_ROW_3 \
@@ -48,7 +48,7 @@
   KEY_J,\
   KEY_K,\
   KEY_L,\
-  KEY_SEMICOLON,\
+  KEY_APOSTROPHE,\
   KEY_ENTER
 
 // Fifth row
@@ -61,8 +61,8 @@
   KEY_B,\
   KEY_N,\
   KEY_M,\
-  KEY_SLASH,\
-  KEY_APOSTROPHE,\
+  KEY_COMMA,\
+  KEY_DOT,\
   KEY_UP,\
   KEY_RIGHTSHIFT
 
@@ -71,12 +71,12 @@
   KEY_COMPOSE,\
   KEY_LEFTMETA,\
   KEY_LEFTALT,\
-  KEY_MINUS,\
+  KEY_BACKSLASH,\
   KEY_EQUAL,\
   KEY_SPACE,\
   KEY_SPACE,\
-  KEY_COMMA,\
-  KEY_DOT,\
+  KEY_MINUS,\
+  KEY_SLASH,\
   KEY_LEFT,\
   KEY_DOWN,\
   KEY_RIGHT
