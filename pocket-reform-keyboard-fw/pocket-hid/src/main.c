@@ -141,7 +141,7 @@ void on_uart_rx() {
         char batinfo[32];
         sprintf(batinfo, "   %.1f%%", (double)percentage);
         insert_bat_icon(batinfo, 0, percentage);
-        gfx_poke_str(0, 0, batinfo);
+        gfx_poke_str(7, 1, batinfo);
         gfx_flush();
       }
       uart_rx_i = 0;
@@ -255,7 +255,7 @@ int main(void)
 
   ws2812_program_init(pio, sm, offset, PIN_LEDS, 800000, false);
 
-  led_set_brightness(0x80);
+  led_set_brightness(0x0);
 
   gfx_init(false);
   anim_hello();
@@ -350,6 +350,19 @@ bool fn_key = 0; // Am I holding FN?
 bool circle = 0; // Am I holding circle?
 
 int command_sent = 0;
+int soc_power_on = 0; // fixme
+
+void remote_turn_on_som() {
+  uart_puts(UART_ID, "\r\n1p\r\n");
+  led_set_brightness(10);
+  soc_power_on = 1;
+}
+
+void remote_turn_off_som() {
+  uart_puts(UART_ID, "\r\n0p\r\n");
+  led_set_brightness(0);
+  soc_power_on = 0;
+}
 
 int process_keyboard(uint8_t* resulting_scancodes) {
   // how many keys are pressed this round
@@ -415,26 +428,18 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         // Is circle key pressed?
         // FIXME HACK
 
-        if (keycode == KEY_COMPOSE &&
-         ( matrix_state[1]
-				|| matrix_state[10]
-				) && !command_sent) {
-          if (matrix_state[1]) {
-            // 1
-            //remote_turn_som_power_on();
-            uart_puts(UART_ID, "\r\n1p\r\n");
-            led_set_brightness(10);
+        if (keycode == KEY_POWER && !command_sent) {
+          if (!soc_power_on) {
+            remote_turn_on_som();
             command_sent = 1;
             //anim_hello();
-          } else if (matrix_state[10]) {
-            //remote_turn_som_power_off();
-            led_set_brightness(0);
-            uart_puts(UART_ID, "\r\n0p\r\n");
+          } else {
+            remote_turn_off_som();
             command_sent = 1;
           }
-        } else if (keycode == HID_KEY_EXECUTE) {
+        } else if (keycode == KEY_COMPOSE) {
           fn_key = 1;
-          //active_matrix = matrix_fn;
+          active_matrix = matrix_fn;
         } else {
           if (active_meta_mode) {
             // not holding the same key?
@@ -468,25 +473,8 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         // key not pressed
         if (keycode == KEY_COMPOSE) {
           command_sent = 0;
-        }
-        else if (keycode == HID_KEY_EXECUTE) {
           fn_key = 0;
-          if (media_toggle) {
-            //active_matrix = matrix_fn_toggled;
-          } else {
-            //active_matrix = matrix;
-          }
-        } else if (keycode == KEY_SYSRQ) {
-          if (fn_key && circle) {
-            if (!media_toggle) {
-              media_toggle = 1;
-              //active_matrix = matrix_fn_toggled;
-            } else {
-              media_toggle = 0;
-              //active_matrix = matrix_fn;
-            }
-          }
-          circle = 0;
+          active_matrix = matrix;
         }
       }
     }
@@ -652,6 +640,35 @@ void led_task(uint32_t color) {
   }
 }
 
+uint8_t led_rgb_buf[12*3*6];
+
+void led_bitmap(uint8_t row, uint8_t* row_rgb) {
+  // row = 5 -> commit
+  if (row > 5) return;
+
+  uint8_t* store = &led_rgb_buf[row*3*12];
+  int offset = 0;
+  for (int x=0; x<3*12; x++) {
+    if (row == 5 && x == 0*3) offset = 3*3;
+    if (row == 5 && x == 2*3) offset = 7*3;
+    store[x] = row_rgb[x+offset];
+    if (row == 5 && x == 4*3) break;
+  }
+
+  if (row == 5) {
+    for (int y=0; y<6; y++) {
+      int w = 12;
+      if (y==5) w = 4;
+      uint8_t* bitmap = &led_rgb_buf[y*3*12];
+      for (int x=0; x<w; x++) {
+        uint32_t pixel_grb = (bitmap[1]<<16u) | (bitmap[2]<<8u) | bitmap[0];
+        pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
+        bitmap+=3;
+      }
+    }
+  }
+}
+
 // Every 10ms, we will sent 1 report for each HID profile (keyboard, mouse etc ..)
 // tud_hid_report_complete_cb() is used to send the next report after previous one is complete
 void hid_task(void)
@@ -678,7 +695,7 @@ void hid_task(void)
 }
 
 int led_brightness = 0;
-int led_hue = 0;
+int led_hue = 127;
 
 typedef struct RgbColor
 {
@@ -811,6 +828,17 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_t
   return 0;
 }
 
+// hid commands are all 4-letter, so they fit in a 32 bit integer
+#define cmd(_s) (*(uint32_t *)(_s))
+#define CMD_TEXT_FRAME      cmd("OLED")     // fill the screen with a single wall of text
+#define CMD_OLED_CLEAR      cmd("WCLR")     // clear the oled display
+#define CMD_OLED_BITMAP     cmd("WBIT")     // (u16 offset, u8 bytes...) write raw bytes into the oled framebuffer
+#define CMD_POWER_OFF       cmd("PWR0")     // turn off power rails
+#define CMD_BACKLIGHT       cmd("LITE")     // keyboard backlight level
+#define CMD_RGB_BACKLIGHT   cmd("LRGB")     // keyboard backlight rgb
+#define CMD_RGB_BITMAP      cmd("XRGB")     // push rgb backlight bitmap
+#define CMD_LOGO            cmd("LOGO")     // play logo animation
+
 // Invoked when received SET_REPORT control request or
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
 void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
@@ -818,7 +846,78 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
   (void) instance;
   (void) buffer;
 
-  if (report_type == HID_REPORT_TYPE_OUTPUT)
+  char repinfo[64];
+
+  //sprintf(repinfo, "Rep: %d/%d   ", report_type, report_id);
+  //gfx_poke_str(1, 1, repinfo);
+  //sprintf(repinfo, "Len: %d   ", bufsize);
+  //gfx_poke_str(1, 2, repinfo);
+  /*if (buffer) {
+    sprintf(repinfo, "%02x %02x %02x %02x %02x %02x", buffer[0], buffer[1], buffer[2],
+            buffer[3], buffer[4], buffer[5]);
+    gfx_poke_str(0, 0, repinfo);
+  }
+
+  gfx_flush();*/
+
+  //return;
+
+  if (bufsize < 5) return;
+
+  // FIXME
+  if (report_type == 2) {
+    // Big Reform style
+    if (report_id == 'x') {
+      const uint32_t command = (buffer[3]<<24u)|(buffer[2]<<16u)|(buffer[1]<<8u)|buffer[0];
+
+      if (command == CMD_TEXT_FRAME) {
+        gfx_clear();
+        gfx_on();
+
+        int c = 4;
+        for (uint8_t y=0; y<4; y++) {
+          for (uint8_t x=0; x<21; x++) {
+            if (buffer[c] == '\n') {
+              c++;
+              x = 0;
+              y++;
+            } else if (x < 21 && y < 4) {
+              gfx_poke(x, y, buffer[c++]);
+            }
+            if (c>=bufsize) break;
+          }
+        }
+        gfx_flush();
+      }
+      else if (command == CMD_POWER_OFF) {
+        //reset_menu();
+        //anim_goodbye();
+        remote_turn_off_som();
+        //keyboard_power_off();
+        //reset_keyboard_state();
+      }
+      else if (command == CMD_OLED_CLEAR) {
+        gfx_clear();
+        gfx_flush();
+      }
+      else if (command == CMD_OLED_BITMAP) {
+        matrix_render_direct((uint8_t*)buffer+4);
+      }
+      else if (command == CMD_RGB_BITMAP) {
+        // row, data (12 * 3 rgb bytes)
+        led_bitmap(buffer[4], (uint8_t*)buffer+5);
+      }
+      else if (command == CMD_RGB_BACKLIGHT) {
+        uint32_t pixel_grb = (buffer[5]<<16u) | (buffer[6]<<8u) | buffer[4];
+        led_task(pixel_grb);
+      }
+      else if (command == CMD_LOGO) {
+        anim_hello();
+      }
+    }
+  }
+
+  /*if (report_type == HID_REPORT_TYPE_OUTPUT)
   {
     // Set keyboard LED e.g Capslock, Numlock etc...
     if (report_id == REPORT_ID_KEYBOARD)
@@ -828,5 +927,5 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
 
       //uint8_t const kbd_leds = buffer[0];
     }
-  }
+    }*/
 }
