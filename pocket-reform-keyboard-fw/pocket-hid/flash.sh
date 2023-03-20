@@ -1,4 +1,4 @@
 #!/bin/bash
 
-picotool load build/pocket-hid.uf2
+sudo picotool load build/pocket-hid.uf2
 

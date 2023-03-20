@@ -88,7 +88,7 @@ bool gfx_init(bool rotate) {
 
   send_cmd2(SetComPins, 0x2);
   send_cmd2(SetContrast, 0x8f);
-  send_cmd2(SetPreCharge, 0xf1);
+  send_cmd2(SetPreCharge, 0x00);
   send_cmd2(SetVComDetect, 0x40);
   send_cmd1(DisplayAllOnResume);
   send_cmd1(NormalDisplay);
@@ -140,6 +140,12 @@ void gfx_clear(void) {
 
 void gfx_contrast(uint8_t c) {
   send_cmd2(SetContrast, c);
+done:
+  return;
+}
+
+void gfx_precharge(uint8_t c) {
+  send_cmd2(SetPreCharge, c);
 done:
   return;
 }
@@ -289,14 +295,15 @@ done:
 }
 
 // bitmap[0] needs to be 0x40!
-void matrix_render_direct(uint8_t* bitmap) {
+void matrix_render_direct(const uint8_t* bitmap) {
   gfx_on();
 
   // Move to the home position
   send_cmd3(PageAddr, 0, MatrixRows - 1);
   send_cmd3(ColumnAddr, 0, (MatrixCols * FontWidth) - 1);
 
-  bitmap[0] = 0x40;
+  // FIXME
+  //bitmap[0] = 0x40;
   i2c_write_blocking_until(i2c0, SSD1306_ADDRESS, bitmap, 1 + MatrixRows * DisplayWidth, false, make_timeout_time_ms(OLED_I2C_TIMEOUT));
 
 done:
