@@ -131,6 +131,7 @@ void on_uart_rx() {
     }
     if (c == '\n') {
       // TODO hack
+      
       if (uart_rx_i>6) {
         gfx_clear();
         //gfx_poke_str(0, 3, uart_rx_line);
@@ -250,7 +251,7 @@ int main(void)
   i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
 
   PIO pio = pio0;
-  int sm = 0;
+  uint sm = 0;
   uint offset = pio_add_program(pio, &ws2812_program);
 
   ws2812_program_init(pio, sm, offset, PIN_LEDS, 800000, false);
@@ -642,7 +643,7 @@ void led_task(uint32_t color) {
 
 uint8_t led_rgb_buf[12*3*6];
 
-void led_bitmap(uint8_t row, uint8_t* row_rgb) {
+void led_bitmap(uint8_t row, const uint8_t* row_rgb) {
   // row = 5 -> commit
   if (row > 5) return;
 
@@ -725,11 +726,11 @@ RgbColor HsvToRgb(HsvColor hsv)
     }
 
     region = hsv.h / 43;
-    remainder = (hsv.h - (region * 43)) * 6;
+    remainder = (unsigned char)((hsv.h - (region * 43)) * 6);
 
-    p = (hsv.v * (255 - hsv.s)) >> 8;
-    q = (hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8;
-    t = (hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8;
+    p = (unsigned char)((hsv.v * (255 - hsv.s)) >> 8);
+    q = (unsigned char)((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
+    t = (unsigned char)((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
 
     switch (region)
     {
@@ -763,9 +764,9 @@ void led_set(uint32_t rgb) {
 void led_set_hsv() {
   HsvColor hsv;
   RgbColor rgb;
-  hsv.h = led_hue;
+  hsv.h = (unsigned char)led_hue;
   hsv.s = 0xff;
-  hsv.v = led_brightness;
+  hsv.v = (unsigned char)led_brightness;
 
   rgb = HsvToRgb(hsv);
   led_set((rgb.r<<16)|(rgb.g<<8)|(rgb.b));
@@ -800,7 +801,7 @@ void led_cycle_hue() {
 // Invoked when sent REPORT successfully to host
 // Application can use this to send the next report
 // Note: For composite reports, report[0] is report ID
-void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint8_t len)
+void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint16_t len)
 {
   (void) instance;
   (void) len;
@@ -828,16 +829,16 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_t
   return 0;
 }
 
-// hid commands are all 4-letter, so they fit in a 32 bit integer
-#define cmd(_s) (*(uint32_t *)(_s))
-#define CMD_TEXT_FRAME      cmd("OLED")     // fill the screen with a single wall of text
-#define CMD_OLED_CLEAR      cmd("WCLR")     // clear the oled display
-#define CMD_OLED_BITMAP     cmd("WBIT")     // (u16 offset, u8 bytes...) write raw bytes into the oled framebuffer
-#define CMD_POWER_OFF       cmd("PWR0")     // turn off power rails
-#define CMD_BACKLIGHT       cmd("LITE")     // keyboard backlight level
-#define CMD_RGB_BACKLIGHT   cmd("LRGB")     // keyboard backlight rgb
-#define CMD_RGB_BITMAP      cmd("XRGB")     // push rgb backlight bitmap
-#define CMD_LOGO            cmd("LOGO")     // play logo animation
+#define CMD_TEXT_FRAME      "OLED"     // fill the screen with a single wall of text
+#define CMD_OLED_CLEAR      "WCLR"     // clear the oled display
+#define CMD_OLED_BITMAP     "WBIT"     // (u16 offset, u8 bytes...) write raw bytes into the oled framebuffer
+#define CMD_POWER_OFF       "PWR0"     // turn off power rails
+#define CMD_BACKLIGHT       "LITE"     // keyboard backlight level
+#define CMD_RGB_BACKLIGHT   "LRGB"     // keyboard backlight rgb
+#define CMD_RGB_BITMAP      "XRGB"     // push rgb backlight bitmap
+#define CMD_LOGO            "LOGO"     // play logo animation
+#define CMD_OLED_BRITE      "OBRT"     // OLED brightness level
+#define CMD_OLED_BRITE2     "OBR2"     // OLED brightness level
 
 // Invoked when received SET_REPORT control request or
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
@@ -846,7 +847,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
   (void) instance;
   (void) buffer;
 
-  char repinfo[64];
+  //char repinfo[64];
 
   //sprintf(repinfo, "Rep: %d/%d   ", report_type, report_id);
   //gfx_poke_str(1, 1, repinfo);
@@ -868,9 +869,9 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
   if (report_type == 2) {
     // Big Reform style
     if (report_id == 'x') {
-      const uint32_t command = (buffer[3]<<24u)|(buffer[2]<<16u)|(buffer[1]<<8u)|buffer[0];
+      const char* cmd = (const char*)buffer;
 
-      if (command == CMD_TEXT_FRAME) {
+      if (cmd == strnstr(cmd, CMD_TEXT_FRAME, 4)) {
         gfx_clear();
         gfx_on();
 
@@ -889,30 +890,46 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
         }
         gfx_flush();
       }
-      else if (command == CMD_POWER_OFF) {
+      else if (cmd == strnstr(cmd, CMD_POWER_OFF, 4)) {
         //reset_menu();
         //anim_goodbye();
         remote_turn_off_som();
         //keyboard_power_off();
         //reset_keyboard_state();
       }
-      else if (command == CMD_OLED_CLEAR) {
+      else if (cmd == strnstr(cmd, CMD_OLED_CLEAR, 4)) {
         gfx_clear();
         gfx_flush();
       }
-      else if (command == CMD_OLED_BITMAP) {
-        matrix_render_direct((uint8_t*)buffer+4);
+      else if (cmd == strnstr(cmd, CMD_OLED_BITMAP, 4)) {
+        matrix_render_direct(&buffer[4]);
       }
-      else if (command == CMD_RGB_BITMAP) {
+      else if (cmd == strnstr(cmd, CMD_RGB_BITMAP, 4)) {
         // row, data (12 * 3 rgb bytes)
-        led_bitmap(buffer[4], (uint8_t*)buffer+5);
+        led_bitmap(buffer[4], &buffer[5]);
       }
-      else if (command == CMD_RGB_BACKLIGHT) {
+      else if (cmd == strnstr(cmd, CMD_RGB_BACKLIGHT, 4)) {
         uint32_t pixel_grb = (buffer[5]<<16u) | (buffer[6]<<8u) | buffer[4];
         led_task(pixel_grb);
       }
-      else if (command == CMD_LOGO) {
+      else if (cmd == strnstr(cmd, CMD_LOGO, 4)) {
         anim_hello();
+      }
+      else if (cmd == strnstr(cmd, CMD_OLED_BRITE, 4)) {
+	uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
+	gfx_poke(0,0,'0'+(val/100));
+	gfx_poke(1,0,'0'+((val%100)/10));
+	gfx_poke(2,0,'0'+(val%10));
+	gfx_flush();
+        gfx_contrast(val);
+      }
+      else if (cmd == strnstr(cmd, CMD_OLED_BRITE2, 4)) {
+	uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
+	gfx_poke(0,0,'0'+(val/100));
+	gfx_poke(1,0,'0'+((val%100)/10));
+	gfx_poke(2,0,'0'+(val%10));
+	gfx_flush();
+        gfx_precharge(val);
       }
     }
   }

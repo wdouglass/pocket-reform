@@ -84,6 +84,7 @@ void gfx_write(const char *data);
 void gfx_write_P(const char *data);
 void gfx_clear_screen(void);
 void gfx_contrast(uint8_t c);
+void gfx_precharge(uint8_t c);
 
 void matrix_clear(struct CharacterMatrix *matrix);
 void matrix_write_char_inner(struct CharacterMatrix *matrix, uint8_t c);
@@ -92,7 +93,7 @@ void matrix_write(struct CharacterMatrix *matrix, const char *data);
 void matrix_write_ln(struct CharacterMatrix *matrix, const char *data);
 void matrix_write_P(struct CharacterMatrix *matrix, const char *data);
 void matrix_render(struct CharacterMatrix *matrix);
-void matrix_render_direct(uint8_t* bitmap);
+void matrix_render_direct(const uint8_t* bitmap);
 
 void oled_brightness_inc(void);
 void oled_brightness_dec(void);
