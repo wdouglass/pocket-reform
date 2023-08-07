@@ -599,6 +599,13 @@ void turn_som_power_on() {
   sleep_ms(10);
   gpio_put(PIN_3V3_ENABLE, 1);
   sleep_ms(10);
+
+  // FIXME spi test
+  gpio_put(PIN_SOM_MOSI, 1);
+  gpio_put(PIN_SOM_SS0, 1);
+  gpio_put(PIN_SOM_SCK, 1);
+  gpio_put(PIN_SOM_MISO, 1);
+
   gpio_put(PIN_5V_ENABLE, 1);
 
   sleep_ms(10);
@@ -608,6 +615,12 @@ void turn_som_power_on() {
 }
 
 void turn_som_power_off() {
+  // FIXME spi test
+  gpio_put(PIN_SOM_MOSI, 0);
+  gpio_put(PIN_SOM_SS0, 0);
+  gpio_put(PIN_SOM_SCK, 0);
+  gpio_put(PIN_SOM_MISO, 0);
+
   gpio_put(PIN_LED_B, 0);
 
   printf("[turn_som_power_off]\n");
@@ -838,9 +851,31 @@ int main() {
   gpio_put(PIN_DISP_EN, 0);
   gpio_put(PIN_DISP_RESET, 0);
 
+  gpio_init(PIN_FLIGHTMODE);
+  gpio_set_dir(PIN_FLIGHTMODE, 1);
+  gpio_put(PIN_FLIGHTMODE, 1); // active low
+
   gpio_put(PIN_LED_R, 0);
   gpio_put(PIN_LED_G, 0);
   gpio_put(PIN_LED_B, 0);
+
+  // TODO: actual SPI bus
+  gpio_init(PIN_SOM_MOSI);
+  gpio_init(PIN_SOM_SS0);
+  gpio_init(PIN_SOM_SCK);
+  gpio_init(PIN_SOM_MISO);
+  gpio_set_dir(PIN_SOM_MOSI, 1);
+  gpio_set_dir(PIN_SOM_SS0, 1);
+  gpio_set_dir(PIN_SOM_SCK, 1);
+  gpio_set_dir(PIN_SOM_MISO, 1);
+  gpio_put(PIN_SOM_MOSI, 0);
+  gpio_put(PIN_SOM_SS0, 0);
+  gpio_put(PIN_SOM_SCK, 0);
+  gpio_put(PIN_SOM_MISO, 0);
+  //gpio_set_pulls(PIN_SOM_MOSI, 0, 0);
+  //gpio_set_pulls(PIN_SOM_MISO, 0, 0);
+  //gpio_set_pulls(PIN_SOM_SS0, 0, 0);
+  //gpio_set_pulls(PIN_SOM_SCK, 0, 0);
 
   unsigned int t = 0;
   unsigned int t_report = 0;
@@ -1008,7 +1043,7 @@ int main() {
       }
     }
 
-    if (t_report>2000) {
+    if (t_report>5000) {
       max_dump();
       t_report = 0;
     }
