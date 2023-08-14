@@ -407,6 +407,13 @@ int print_src_fixed_pdo(uint32_t pdo) {
 }
 
 int charger_dump() {
+  // set input current limit to 2000mA
+  mps_write_byte(0x00, (1<<5)|(1<<3));
+  // set input voltage limit to 4.5V (minimum voltage)
+  mps_write_byte(0x01, (1<<5)|(1<<3)|(1<<2)|1);
+  // set charge current limit to 2000mA (1600+400)
+  mps_write_byte(0x02, (1<<5)|(1<<3));
+
   uint8_t status = mps_read_byte(0x13);
   uint8_t fault = mps_read_byte(0x14);
 
@@ -440,10 +447,10 @@ int charger_dump() {
   printf("  adc_discharge_c: %f\n", adc_discharge_c);
   printf("  adc_ntc_v: %f\n  ------------\n", adc_ntc_v);
 
-  printf("  input_c_limit: %d\n", input_c_limit);
-  printf("  input_v_limit: %d\n", input_v_limit);
-  printf("  charge_c: %d\n", charge_c);
-  printf("  precharge_c: %d\n", precharge_c);
+  printf("  input_c_limit: %x\n", input_c_limit);
+  printf("  input_v_limit: %x\n", input_v_limit);
+  printf("  charge_c: %x\n", charge_c);
+  printf("  precharge_c: %x\n", precharge_c);
   printf("  bat_full_v: %d\n  ============\n", bat_full_v);
 
   if (adc_input_v < 11) {
@@ -959,7 +966,10 @@ int main() {
       //printf("[pocket-sysctl] state 2\n");
 
       if (t>2000) {
-        printf("[pocket-sysctl] state 2, timeout\n");
+        printf("[pocket-sysctl] state 2, timeout, sleep\n");
+        // save power
+        sleep_ms(100);
+        t += 100;
 
         // issue hard reset
         fusb_write_byte(FUSB_CONTROL3, (1<<6) | 0x07);
