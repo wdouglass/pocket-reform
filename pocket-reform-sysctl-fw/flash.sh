@@ -1,4 +1,4 @@
 #!/bin/bash
 
-picotool load ./build/sysctl.uf2
+picotool load -f build/sysctl.uf2
 
