@@ -131,7 +131,7 @@ void on_uart_rx() {
     }
     if (c == '\n') {
       // TODO hack
-      
+
       if (uart_rx_i>6) {
         gfx_clear();
         //gfx_poke_str(0, 3, uart_rx_line);
@@ -916,19 +916,19 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
         anim_hello();
       }
       else if (cmd == strnstr(cmd, CMD_OLED_BRITE, 4)) {
-	uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
-	gfx_poke(0,0,'0'+(val/100));
-	gfx_poke(1,0,'0'+((val%100)/10));
-	gfx_poke(2,0,'0'+(val%10));
-	gfx_flush();
+        uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
+        gfx_poke(0,0,'0'+(val/100));
+        gfx_poke(1,0,'0'+((val%100)/10));
+        gfx_poke(2,0,'0'+(val%10));
+        gfx_flush();
         gfx_contrast(val);
       }
       else if (cmd == strnstr(cmd, CMD_OLED_BRITE2, 4)) {
-	uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
-	gfx_poke(0,0,'0'+(val/100));
-	gfx_poke(1,0,'0'+((val%100)/10));
-	gfx_poke(2,0,'0'+(val%10));
-	gfx_flush();
+        uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
+        gfx_poke(0,0,'0'+(val/100));
+        gfx_poke(1,0,'0'+((val%100)/10));
+        gfx_poke(2,0,'0'+(val%10));
+        gfx_flush();
         gfx_precharge(val);
       }
     }
