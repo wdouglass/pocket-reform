@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.17)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../tinyusb/hw/bsp/family_support.cmake)
 
 # gets PROJECT name for the example (e.g. <BOARD>-<DIR_NAME>)
 family_get_project_name(PROJECT ${CMAKE_CURRENT_LIST_DIR})
 
-project(${PROJECT})
+project(${PROJECT} C CXX ASM)
 
 # Checks this example is valid for the family and initializes the project
 family_initialize_project(${PROJECT} ${CMAKE_CURRENT_LIST_DIR})
@@ -24,9 +24,11 @@ target_include_directories(${PROJECT} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-# Configure compilation flags and libraries for the example... see the corresponding function
-# in hw/bsp/FAMILY/family.cmake for details.
-family_configure_device_example(${PROJECT})
+target_compile_definitions(${PROJECT} PUBLIC PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
+
+# Configure compilation flags and libraries for the example without RTOS.
+# See the corresponding function in hw/bsp/FAMILY/family.cmake for details.
+family_configure_device_example(${PROJECT} noos)
 
 target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c hardware_pio)
 
