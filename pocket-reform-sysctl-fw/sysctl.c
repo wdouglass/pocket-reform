@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
+#include "pico/sleep.h"
 #include "hardware/i2c.h"
 #include "hardware/irq.h"
+#include "hardware/rtc.h"
 #include "fusb302b.h"
 #include "pd.h"
 
-#define FW_REV "PREF1SYS D1 20220824"
+#define FW_REV "PREF1SYS D2 20231207"
 
 #define PIN_SDA 0
 #define PIN_SCL 1
@@ -27,11 +29,15 @@
 #define PIN_LED_B 15
 #define PIN_LED_R 16
 #define PIN_LED_G 17
+#define PIN_MODEM_POWER 18
 #define PIN_SOM_WAKE 19
+#define PIN_MODEM_RESET 20
 #define PIN_1V1_ENABLE 23
 #define PIN_3V3_ENABLE 24
 #define PIN_5V_ENABLE 25
+#define PIN_PHONE_DPR 27
 #define PIN_USB_SRC_ENABLE 28
+#define PIN_PWREN_LATCH 29
 
 // FUSB302B USB-PD controller
 #define FUSB_ADDR 0x22
@@ -409,8 +415,8 @@ int print_src_fixed_pdo(uint32_t pdo) {
 int charger_dump() {
   // set input current limit to 2000mA
   mps_write_byte(0x00, (1<<5)|(1<<3));
-  // set input voltage limit to 4.5V (minimum voltage)
-  mps_write_byte(0x01, (1<<5)|(1<<3)|(1<<2)|1);
+  // set input voltage limit to 6V (above 5V USB voltage)
+  mps_write_byte(0x01, (1<<6));
   // set charge current limit to 2000mA (1600+400)
   mps_write_byte(0x02, (1<<5)|(1<<3));
 
@@ -599,6 +605,9 @@ void max_dump() {
 }
 
 void turn_som_power_on() {
+  // latch
+  gpio_put(PIN_PWREN_LATCH, 1);
+
   gpio_put(PIN_LED_B, 1);
 
   printf("[turn_som_power_on]\n");
@@ -615,13 +624,28 @@ void turn_som_power_on() {
 
   gpio_put(PIN_5V_ENABLE, 1);
 
+  // MODEM
+  gpio_put(PIN_FLIGHTMODE, 1); // active low
+  gpio_put(PIN_MODEM_RESET, 0); // active low (?)
+  gpio_put(PIN_MODEM_POWER, 1); // active high
+  gpio_put(PIN_PHONE_DPR, 1); // active high
+
   sleep_ms(10);
   gpio_put(PIN_DISP_EN, 1);
   sleep_ms(10);
-  gpio_put(PIN_DISP_RESET, 1); // not connected?
+  gpio_put(PIN_DISP_RESET, 1);
+
+  // MODEM
+  gpio_put(PIN_MODEM_RESET, 1); // active low
+
+  // done with latching
+  gpio_put(PIN_PWREN_LATCH, 0);
 }
 
 void turn_som_power_off() {
+  // latch
+  gpio_put(PIN_PWREN_LATCH, 1);
+
   // FIXME spi test
   gpio_put(PIN_SOM_MOSI, 0);
   gpio_put(PIN_SOM_SS0, 0);
@@ -634,11 +658,20 @@ void turn_som_power_off() {
   gpio_put(PIN_DISP_RESET, 0);
   gpio_put(PIN_DISP_EN, 0);
 
+  // MODEM
+  gpio_put(PIN_FLIGHTMODE, 0); // active low
+  gpio_put(PIN_MODEM_RESET, 0); // active low
+  gpio_put(PIN_MODEM_POWER, 0); // active high
+  gpio_put(PIN_PHONE_DPR, 0); // active high
+
   gpio_put(PIN_5V_ENABLE, 0);
   sleep_ms(10);
   gpio_put(PIN_3V3_ENABLE, 0);
   sleep_ms(10);
   gpio_put(PIN_1V1_ENABLE, 0);
+
+  // done with latching
+  gpio_put(PIN_PWREN_LATCH, 0);
 }
 
 #define ST_EXPECT_DIGIT_0 0
@@ -812,9 +845,10 @@ void on_uart_rx() {
 }
 
 int main() {
+  set_sys_clock_48mhz();
+
   stdio_init_all();
 
-  //sleep_ms(2000);
   // UART to keyboard
   uart_init(UART_ID, BAUD_RATE);
   uart_set_format(UART_ID, DATA_BITS, STOP_BITS, PARITY);
@@ -826,8 +860,6 @@ int main() {
   //irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
   //irq_set_enabled(UART_IRQ, true);
   //uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
-
-  printf("uart setup\n");
 
   gpio_set_function(PIN_SDA, GPIO_FUNC_I2C);
   gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
@@ -851,6 +883,10 @@ int main() {
   gpio_put(PIN_3V3_ENABLE, 0);
   gpio_put(PIN_5V_ENABLE, 0);
 
+  gpio_init(PIN_PWREN_LATCH);
+  gpio_set_dir(PIN_PWREN_LATCH, 1);
+  gpio_put(PIN_PWREN_LATCH, 0);
+
   gpio_init(PIN_DISP_RESET);
   gpio_init(PIN_DISP_EN);
   gpio_set_dir(PIN_DISP_EN, 1);
@@ -859,8 +895,17 @@ int main() {
   gpio_put(PIN_DISP_RESET, 0);
 
   gpio_init(PIN_FLIGHTMODE);
+  gpio_init(PIN_MODEM_POWER);
+  gpio_init(PIN_MODEM_RESET);
+  gpio_init(PIN_PHONE_DPR);
   gpio_set_dir(PIN_FLIGHTMODE, 1);
-  gpio_put(PIN_FLIGHTMODE, 1); // active low
+  gpio_set_dir(PIN_MODEM_POWER, 1);
+  gpio_set_dir(PIN_MODEM_RESET, 1);
+  gpio_set_dir(PIN_PHONE_DPR, 1);
+  gpio_put(PIN_FLIGHTMODE, 0); // active low
+  gpio_put(PIN_MODEM_POWER, 0); // active high
+  gpio_put(PIN_MODEM_RESET, 0); // active low (?)
+  gpio_put(PIN_PHONE_DPR, 0); // active high // causes 0.146W power use when high in off state!
 
   gpio_put(PIN_LED_R, 0);
   gpio_put(PIN_LED_G, 0);
@@ -884,6 +929,14 @@ int main() {
   //gpio_set_pulls(PIN_SOM_SS0, 0, 0);
   //gpio_set_pulls(PIN_SOM_SCK, 0, 0);
 
+  gpio_init(PIN_USB_SRC_ENABLE);
+  gpio_set_dir(PIN_USB_SRC_ENABLE, 1);
+  gpio_put(PIN_USB_SRC_ENABLE, 0);
+
+  // latch the PWR and display pins
+  gpio_put(PIN_PWREN_LATCH, 1);
+  gpio_put(PIN_PWREN_LATCH, 0);
+
   unsigned int t = 0;
   unsigned int t_report = 0;
 
@@ -899,7 +952,7 @@ int main() {
 
   // https://www.reclaimerlabs.com/blog/2017/2/1/usb-c-for-engineers-part-3
 
-  printf("main loop\n");
+  printf("[pocket-sysctl] entering main loop.\n");
 
   while (true) {
     sleep_ms(1);
@@ -911,6 +964,9 @@ int main() {
     if (state == 0) {
       gpio_put(PIN_LED_R, 0);
       power_objects = 0;
+
+      // by default, we output 5V on VUSB
+      gpio_put(PIN_USB_SRC_ENABLE, 1);
 
       //printf("[pocket-sysctl] state 0\n");
       // probe FUSB302BMPX
@@ -984,6 +1040,9 @@ int main() {
       int res = fusb_read_message(&rx_msg);
 
       if (!res) {
+        // if a charger is responding, turn off our 5V output
+        gpio_put(PIN_USB_SRC_ENABLE, 0);
+
         uint8_t msgtype = PD_MSGTYPE_GET(&rx_msg);
         uint8_t numobj = PD_NUMOBJ_GET(&rx_msg);
         printf("  msg type: %x numobj: %d\n", msgtype, numobj);
