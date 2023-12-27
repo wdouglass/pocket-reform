@@ -5460,6 +5460,10 @@
     (effects (font (size 1.524 1.524)) (justify left bottom))
     (uuid 354dae81-649a-4073-bc14-d16d71dc3ff2)
   )
+  (text "DNP!" (at 130.81 251.46 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 4046dce5-e50c-4f33-8bd3-d2d9902e8c97)
+  )
   (text "To SYSCTL" (at 201.93 248.92 0)
     (effects (font (size 1.524 1.524)) (justify left bottom))
     (uuid 71a8338a-93b7-4d5b-9230-791c092ed72a)
@@ -6284,15 +6288,15 @@
     (property "Manufacturer_No" "MCP1700T-3302E/TT" (at 133.35 259.08 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Flags" "" (at 133.35 259.08 0)
+    (property "Flags" "DNP" (at 133.35 259.08 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C39051" (at 133.35 259.08 0)
+    (property "LCSC" "DNP" (at 133.35 259.08 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid ecc11128-982c-493f-8954-48d088c75e0a))
-    (pin "2" (uuid e2e57b52-900b-4b36-9e75-766de71bc780))
-    (pin "3" (uuid 93915fc1-8635-437c-a0ab-c3bb0e883e8e))
+    (pin "1" (uuid f4b26cb1-dd10-4f93-9806-b1c915998032))
+    (pin "2" (uuid 292c618e-ffa0-4eee-8e97-56fd0e183d36))
+    (pin "3" (uuid 2674905f-0f83-4132-a5a8-be06f6065417))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -6317,7 +6321,7 @@
     (property "Datasheet" "" (at 119.38 257.81 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2191a376-0825-4c0d-b8c8-5382060c4bb5))
+    (pin "1" (uuid a35c6e1a-d7b9-4bdd-b565-7b233a5b9888))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -6342,7 +6346,7 @@
     (property "Datasheet" "" (at 133.35 269.24 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 213f6bc8-db5f-4e23-bf69-b912852ec281))
+    (pin "1" (uuid 2737db2a-dbb3-46f8-9103-53405cb6861a))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -6367,7 +6371,7 @@
     (property "Datasheet" "" (at 147.32 257.81 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2a38f5c9-2066-449e-8bd7-3e24a8da9e9a))
+    (pin "1" (uuid c0cca86a-1f3b-4c9b-b08c-2e74eb2553a8))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -6404,8 +6408,8 @@
     (property "LCSC" "C14664" (at 119.38 262.89 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 2042f931-cb32-43b6-ab4b-4fede908c297))
-    (pin "2" (uuid f454a621-4eda-4982-94c1-74cd4c57dda1))
+    (pin "1" (uuid 33718aa2-aae3-4428-a5fb-c9bfaa7d18de))
+    (pin "2" (uuid 6d113ead-980b-4dd0-afaa-8f85e584bd96))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -6471,7 +6475,7 @@
     (property "Reference" "R8" (at 143.51 262.9916 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "0" (at 143.51 261.493 90)
+    (property "Value" "DNP" (at 143.51 261.493 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 143.51 259.08 0)
@@ -6534,7 +6538,7 @@
     (property "Value" "MNT" (at 104.14 272.923 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "footprints:mpre-keyboard-badge-d3" (at 101.6 271.78 0)
+    (property "Footprint" "footprints:mpre-keyboard-badge-r1" (at 101.6 271.78 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 101.6 271.78 0)
@@ -9129,7 +9133,7 @@
     (property "Datasheet" "" (at 158.75 22.86 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 17d03c8d-7f0c-42c1-8784-1df7a46b6708))
+    (pin "1" (uuid d78f0c9f-c718-48ec-b4ba-df7d016af5cf))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -9940,10 +9944,10 @@
     (property "Manufacturer_No" "SK6805-EC15" (at 158.75 34.29 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 17f20aab-88ac-43f7-9125-e48157ed2533))
-    (pin "2" (uuid c806fc41-7f41-4dd1-a9d0-b41134b4f15d))
-    (pin "3" (uuid 59fa117b-c8c1-45e1-816a-7b868d41e28e))
-    (pin "4" (uuid 83e9574c-423d-4509-a093-3004d8de2d6a))
+    (pin "1" (uuid f4401358-b7f8-444e-9dc7-9187eecae8f6))
+    (pin "2" (uuid b8714661-126a-4566-a8f0-a983f859b3a3))
+    (pin "3" (uuid 0f5002ad-7d96-48b0-8a11-cde6c9eb8f7e))
+    (pin "4" (uuid 119e4b7c-ef00-4f9e-9978-ca8507233c4e))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -10802,7 +10806,7 @@
     (property "Datasheet" "" (at 158.75 137.16 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid ff83fc5b-c298-4f8c-9cd9-f6dc2489ab20))
+    (pin "1" (uuid 16761f18-7257-4a1f-8c49-5322647a8d7a))
     (instances
       (project "pocket-reform-keyboard-kailh-ortho"
         (path "/4288acd2-00c5-4bcf-8d29-ce89e52624fd/00000000-0000-0000-0000-00006195bbbb"
@@ -11907,19 +11911,19 @@
     (property "Value" "SW_HWB" (at 69.342 238.633 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Button_Switch_SMD:SW_DIP_SPSTx01_Slide_6.7x4.1mm_W6.73mm_P2.54mm_LowProfile_JPin" (at 66.04 237.49 0)
+    (property "Footprint" "footprints:Diptronics-PTLP2" (at 66.04 237.49 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 66.04 237.49 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Manufacturer" "Dongguan Guangzhu" (at 66.04 237.49 0)
+    (property "Manufacturer" "XKB" (at 66.04 237.49 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Manufacturer_No" "DSIC01LSGET" (at 66.04 237.49 0)
+    (property "Manufacturer_No" "TS-1185EC-C-D-B" (at 66.04 237.49 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "LCSC" "C402914" (at 66.04 237.49 0)
+    (property "LCSC" "C318893" (at 66.04 237.49 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid fd0f7103-2bba-4916-bdb6-90ff36c62cc3))
