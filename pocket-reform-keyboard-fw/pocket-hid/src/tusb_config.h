@@ -47,7 +47,7 @@
 // RHPort max operational speed can defined by board.mk
 // Default to max (auto) speed for MCU with internal HighSpeed PHY
 #ifndef BOARD_DEVICE_RHPORT_SPEED
-  #define BOARD_DEVICE_RHPORT_SPEED   OPT_MODE_DEFAULT_SPEED
+  #define BOARD_DEVICE_RHPORT_SPEED   OPT_MODE_LOW_SPEED
 #endif
 
 // Device mode with rhport and speed defined by board.mk

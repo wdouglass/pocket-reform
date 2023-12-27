@@ -173,6 +173,9 @@ void anim_hello(void) {
 int main(void)
 {
   board_init();
+
+  set_sys_clock_48mhz();
+
   tusb_init();
 
   uart_init(UART_ID, BAUD_RATE);
@@ -183,59 +186,64 @@ int main(void)
   gpio_set_function(PIN_UART_RX, GPIO_FUNC_UART);
   unsigned int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
 
-  gpio_pull_up(PIN_COL1);
   gpio_init(PIN_LEDS);
   gpio_set_dir(PIN_LEDS, true); // output
 
   gpio_init(PIN_COL1);
-  gpio_set_dir(PIN_COL1, false);
-  gpio_pull_up(PIN_COL1);
+  gpio_set_dir(PIN_COL1, true);
+  //gpio_pull_up(PIN_COL1);
   gpio_init(PIN_COL2);
-  gpio_set_dir(PIN_COL2, false);
-  gpio_pull_up(PIN_COL2);
+  gpio_set_dir(PIN_COL2, true);
+  //gpio_pull_up(PIN_COL2);
   gpio_init(PIN_COL3);
-  gpio_set_dir(PIN_COL3, false);
-  gpio_pull_up(PIN_COL3);
+  gpio_set_dir(PIN_COL3, true);
+  //gpio_pull_up(PIN_COL3);
   gpio_init(PIN_COL4);
-  gpio_set_dir(PIN_COL4, false);
-  gpio_pull_up(PIN_COL4);
+  gpio_set_dir(PIN_COL4, true);
+  //gpio_pull_up(PIN_COL4);
   gpio_init(PIN_COL5);
-  gpio_set_dir(PIN_COL5, false);
-  gpio_pull_up(PIN_COL5);
+  gpio_set_dir(PIN_COL5, true);
+  //gpio_pull_up(PIN_COL5);
   gpio_init(PIN_COL6);
-  gpio_set_dir(PIN_COL6, false);
-  gpio_pull_up(PIN_COL6);
+  gpio_set_dir(PIN_COL6, true);
+  //gpio_pull_up(PIN_COL6);
   gpio_init(PIN_COL7);
-  gpio_set_dir(PIN_COL7, false);
-  gpio_pull_up(PIN_COL7);
+  gpio_set_dir(PIN_COL7, true);
+  //gpio_pull_up(PIN_COL7);
   gpio_init(PIN_COL8);
-  gpio_set_dir(PIN_COL8, false);
-  gpio_pull_up(PIN_COL8);
+  gpio_set_dir(PIN_COL8, true);
+  //gpio_pull_up(PIN_COL8);
   gpio_init(PIN_COL9);
-  gpio_set_dir(PIN_COL9, false);
-  gpio_pull_up(PIN_COL9);
+  gpio_set_dir(PIN_COL9, true);
+  //gpio_pull_up(PIN_COL9);
   gpio_init(PIN_COL10);
-  gpio_set_dir(PIN_COL10, false);
-  gpio_pull_up(PIN_COL10);
+  gpio_set_dir(PIN_COL10, true);
+  //gpio_pull_up(PIN_COL10);
   gpio_init(PIN_COL11);
-  gpio_set_dir(PIN_COL11, false);
-  gpio_pull_up(PIN_COL11);
+  gpio_set_dir(PIN_COL11, true);
+  //gpio_pull_up(PIN_COL11);
   gpio_init(PIN_COL12);
-  gpio_set_dir(PIN_COL12, false);
-  gpio_pull_up(PIN_COL12);
+  gpio_set_dir(PIN_COL12, true);
+  //gpio_pull_up(PIN_COL12);
 
   gpio_init(PIN_ROW1);
-  gpio_set_dir(PIN_ROW1, true);
+  gpio_set_dir(PIN_ROW1, false);
+  gpio_pull_down(PIN_ROW1);
   gpio_init(PIN_ROW2);
-  gpio_set_dir(PIN_ROW2, true);
+  gpio_set_dir(PIN_ROW2, false);
+  gpio_pull_down(PIN_ROW2);
   gpio_init(PIN_ROW3);
-  gpio_set_dir(PIN_ROW3, true);
+  gpio_set_dir(PIN_ROW3, false);
+  gpio_pull_down(PIN_ROW3);
   gpio_init(PIN_ROW4);
-  gpio_set_dir(PIN_ROW4, true);
+  gpio_set_dir(PIN_ROW4, false);
+  gpio_pull_down(PIN_ROW4);
   gpio_init(PIN_ROW5);
-  gpio_set_dir(PIN_ROW5, true);
+  gpio_set_dir(PIN_ROW5, false);
+  gpio_pull_down(PIN_ROW5);
   gpio_init(PIN_ROW6);
-  gpio_set_dir(PIN_ROW6, true);
+  gpio_set_dir(PIN_ROW6, false);
+  gpio_pull_down(PIN_ROW6);
 
   i2c_init(i2c0, 100 * 1000);
   gpio_set_function(PIN_SDA, GPIO_FUNC_I2C);
@@ -374,42 +382,53 @@ int process_keyboard(uint8_t* resulting_scancodes) {
     pressed_scancodes[i] = 0;
   }
 
-  // pull ROWs low one after the other
-  for (int y = 0; y < KBD_ROWS; y++) {
-    switch (y) {
-    case 0: gpio_put(PIN_ROW1, 0); break;
-    case 1: gpio_put(PIN_ROW2, 0); break;
-    case 2: gpio_put(PIN_ROW3, 0); break;
-    case 3: gpio_put(PIN_ROW4, 0); break;
-    case 4: gpio_put(PIN_ROW5, 0); break;
-    case 5: gpio_put(PIN_ROW6, 0); break;
+  for (int x = 0; x < KBD_COLS; x++) {
+    gpio_put(PIN_COL1, 0);
+    gpio_put(PIN_COL2, 0);
+    gpio_put(PIN_COL3, 0);
+    gpio_put(PIN_COL4, 0);
+    gpio_put(PIN_COL5, 0);
+    gpio_put(PIN_COL6, 0);
+    gpio_put(PIN_COL7, 0);
+    gpio_put(PIN_COL8, 0);
+    gpio_put(PIN_COL9, 0);
+    gpio_put(PIN_COL10, 0);
+    gpio_put(PIN_COL11, 0);
+    gpio_put(PIN_COL12, 0);
+
+    switch (x) {
+    case 0: gpio_put(PIN_COL1, 1); break;
+    case 1: gpio_put(PIN_COL2, 1); break;
+    case 2: gpio_put(PIN_COL3, 1); break;
+    case 3: gpio_put(PIN_COL4, 1); break;
+    case 4: gpio_put(PIN_COL5, 1); break;
+    case 5: gpio_put(PIN_COL6, 1); break;
+    case 6: gpio_put(PIN_COL7, 1); break;
+    case 7: gpio_put(PIN_COL8, 1); break;
+    case 8: gpio_put(PIN_COL9, 1); break;
+    case 9: gpio_put(PIN_COL10, 1); break;
+    case 10: gpio_put(PIN_COL11, 1); break;
+    case 11: gpio_put(PIN_COL12, 1); break;
     }
 
     // wait for signal to stabilize
-    // TODO maybe not necessary
     //_delay_us(10);
+    sleep_us(1);
 
-    // check input COLs
-    for (int x = 0; x < KBD_COLS; x++) {
+    for (int y = 0; y < KBD_ROWS; y++) {
       uint8_t keycode;
       int loc = y*KBD_COLS+x;
       keycode = active_matrix[loc];
       uint8_t  pressed = 0;
       uint8_t  debounced_pressed = 0;
 
-      switch (x) {
-      case 0:  pressed = !gpio_get(PIN_COL1); break;
-      case 1:  pressed = !gpio_get(PIN_COL2); break;
-      case 2:  pressed = !gpio_get(PIN_COL3); break;
-      case 3:  pressed = !gpio_get(PIN_COL4); break;
-      case 4:  pressed = !gpio_get(PIN_COL5); break;
-      case 5:  pressed = !gpio_get(PIN_COL6); break;
-      case 6:  pressed = !gpio_get(PIN_COL7); break;
-      case 7:  pressed = !gpio_get(PIN_COL8); break;
-      case 8:  pressed = !gpio_get(PIN_COL9); break;
-      case 9:  pressed = !gpio_get(PIN_COL10); break;
-      case 10: pressed = !gpio_get(PIN_COL11); break;
-      case 11: pressed = !gpio_get(PIN_COL12); break;
+      switch (y) {
+      case 0:  pressed = gpio_get(PIN_ROW1); break;
+      case 1:  pressed = gpio_get(PIN_ROW2); break;
+      case 2:  pressed = gpio_get(PIN_ROW3); break;
+      case 3:  pressed = gpio_get(PIN_ROW4); break;
+      case 4:  pressed = gpio_get(PIN_ROW5); break;
+      case 5:  pressed = gpio_get(PIN_ROW6); break;
       }
 
       // shift new state as bit into debounce "register"
@@ -478,15 +497,6 @@ int process_keyboard(uint8_t* resulting_scancodes) {
           active_matrix = matrix;
         }
       }
-    }
-
-    switch (y) {
-    case 0: gpio_put(PIN_ROW1, 1); break;
-    case 1: gpio_put(PIN_ROW2, 1); break;
-    case 2: gpio_put(PIN_ROW3, 1); break;
-    case 3: gpio_put(PIN_ROW4, 1); break;
-    case 4: gpio_put(PIN_ROW5, 1); break;
-    case 5: gpio_put(PIN_ROW6, 1); break;
     }
   }
 

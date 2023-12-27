@@ -24,13 +24,13 @@ target_include_directories(${PROJECT} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
 
-target_compile_definitions(${PROJECT} PUBLIC PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
-
 # Configure compilation flags and libraries for the example without RTOS.
 # See the corresponding function in hw/bsp/FAMILY/family.cmake for details.
 family_configure_device_example(${PROJECT} noos)
 
 target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c hardware_pio)
+
+target_compile_definitions(${PROJECT} PUBLIC PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
 
 target_compile_definitions(${PROJECT} PUBLIC
 	PICO_XOSC_STARTUP_DELAY_MULTIPLIER=64
