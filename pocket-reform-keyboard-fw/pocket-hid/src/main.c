@@ -365,6 +365,11 @@ void remote_turn_off_som() {
   soc_power_on = 0;
 }
 
+void remote_wake_som() {
+  uart_puts(UART_ID, "\r\n1w\r\n");
+  anim_hello();
+}
+
 int process_keyboard(uint8_t* resulting_scancodes) {
   // how many keys are pressed this round
   uint8_t total_pressed = 0;
@@ -429,7 +434,7 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         // Is circle key pressed?
         // FIXME HACK
 
-        if (keycode == KEY_POWER && !command_sent) {
+        if (keycode == KEY_ENTER && fn_key && !command_sent) {
           if (!soc_power_on) {
             remote_turn_on_som();
             command_sent = 1;
@@ -438,6 +443,8 @@ int process_keyboard(uint8_t* resulting_scancodes) {
             remote_turn_off_som();
             command_sent = 1;
           }
+        } else if (keycode == KEY_F12) {
+          remote_wake_som();
         } else if (keycode == KEY_COMPOSE) {
           fn_key = 1;
           active_matrix = matrix_fn;
@@ -681,10 +688,8 @@ void hid_task(void)
   if ( board_millis() - start_ms < interval_ms) return; // not enough time
   start_ms += interval_ms;
 
-  uint32_t const btn = 0; //board_button_read();
-
   // Remote wakeup
-  if ( tud_suspended() && btn )
+  if ( tud_suspended() && pressed_keycodes[0] )
   {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
