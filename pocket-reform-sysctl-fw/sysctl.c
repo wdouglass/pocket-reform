@@ -168,6 +168,7 @@ float max_word_to_cap(uint16_t w)
 
 float max_word_to_percentage(uint16_t w)
 {
+  // TODO: cap to 100%
   float result = ((float)w)*0.00390625;
   return result;
 }
@@ -335,7 +336,9 @@ uint8_t fusb_read_message(union pd_msg *msg)
   /* If this isn't an SOP message, return error.
    * Because of our configuration, we should be able to assume this means the
    * buffer is empty, and not try to read past a non-SOP message. */
-  if ((fusb_read_byte(FUSB_FIFOS) & FUSB_FIFO_RX_TOKEN_BITS)
+  uint8_t rxb = fusb_read_byte(FUSB_FIFOS);
+  if (rxb!=0) printf("[rxb] %x\n", rxb);
+  if ((rxb & FUSB_FIFO_RX_TOKEN_BITS)
       != FUSB_FIFO_RX_SOP) {
     return 1;
   }
@@ -412,13 +415,21 @@ int print_src_fixed_pdo(uint32_t pdo) {
   return voltage;
 }
 
-int charger_dump() {
+int charger_configure() {
+  // TODO: check all MP2650 registers, esp. 4, 7, b
+
   // set input current limit to 2000mA
   mps_write_byte(0x00, (1<<5)|(1<<3));
   // set input voltage limit to 6V (above 5V USB voltage)
   mps_write_byte(0x01, (1<<6));
   // set charge current limit to 2000mA (1600+400)
   mps_write_byte(0x02, (1<<5)|(1<<3));
+}
+
+float charger_dump() {
+  // TODO: if max reports overvoltage (dysbalanced cells),
+  // can we lower the charging voltage temporarily?
+  // alternatively, the current
 
   uint8_t status = mps_read_byte(0x13);
   uint8_t fault = mps_read_byte(0x14);
@@ -439,44 +450,53 @@ int charger_dump() {
   uint8_t precharge_c = mps_read_byte(0x03);
   uint8_t bat_full_v = mps_read_byte(0x04);
 
-  printf("[charger info]\n");
-  printf("  status: %x\n", status);
-  printf("  fault: %x\n  ------------\n", fault);
+  int print_charger_info = 1;
+  if (print_charger_info) {
+    printf("[charger info]\n");
+    printf("  status: %x\n", status);
+    printf("  fault: %x\n  ------------\n", fault);
 
-  printf("  adc_bat_v: %f\n", adc_bat_v);
-  printf("  adc_sys_v: %f\n", adc_sys_v);
-  printf("  adc_charge_c: %f\n", adc_charge_c);
-  printf("  adc_input_v: %f\n", adc_input_v);
-  printf("  adc_input_c: %f\n", adc_input_c);
-  printf("  adc_temp: %f\n", adc_temp);
-  printf("  adc_sys_pwr: %f\n", adc_sys_pwr);
-  printf("  adc_discharge_c: %f\n", adc_discharge_c);
-  printf("  adc_ntc_v: %f\n  ------------\n", adc_ntc_v);
+    printf("  adc_bat_v: %f\n", adc_bat_v);
+    printf("  adc_sys_v: %f\n", adc_sys_v);
+    printf("  adc_charge_c: %f\n", adc_charge_c);
+    printf("  adc_input_v: %f\n", adc_input_v);
+    printf("  adc_input_c: %f\n", adc_input_c);
+    printf("  adc_temp: %f\n", adc_temp);
+    printf("  adc_sys_pwr: %f\n", adc_sys_pwr);
+    printf("  adc_discharge_c: %f\n", adc_discharge_c);
+    printf("  adc_ntc_v: %f\n  ------------\n", adc_ntc_v);
 
-  printf("  input_c_limit: %x\n", input_c_limit);
-  printf("  input_v_limit: %x\n", input_v_limit);
-  printf("  charge_c: %x\n", charge_c);
-  printf("  precharge_c: %x\n", precharge_c);
-  printf("  bat_full_v: %d\n  ============\n", bat_full_v);
-
-  if (adc_input_v < 11) {
-    // renegotiate PD
-    return 1;
+    printf("  input_c_limit: %x\n", input_c_limit);
+    printf("  input_v_limit: %x\n", input_v_limit);
+    printf("  charge_c: %x\n", charge_c);
+    printf("  precharge_c: %x\n", precharge_c);
+    printf("  bat_full_v: %d\n  ============\n", bat_full_v);
   }
-  return 0;
+
+  return adc_input_v;
 }
 
 void max_dump() {
   // disable write protection (CommStat)
   max_write_word(0x61, 0x0000);
   max_write_word(0x61, 0x0000);
+  // set pack cfg: 2 cells (0), 1+1 thermistor, 6v charge pump, 11:thtype=10k, btpken on, no aoldo
+  max_write_word_100(0xb5, (0<<14)|(1<<13)|(0<<11)|(0<<8)|(2<<2)|0);
+
   // fixme set thermistor config
-  max_write_word_100(0xca, 0x58ef);
-  // set pack cfg: 2 cells (0), 1 thermistor, 6v charge pump (?), no aoldo, btpken off (??)
-  max_write_word_100(0xb5, (1<11)|(0<<8)|(0<<2)|0);
+  //max_write_word_100(0xca, 0x30fb); // for 100k, beta value 4250
+
+  // TODO: need to enable balancing (zener?)
+  // nBalCfg
+  max_write_word(0x61, 0x0000);
+  max_write_word(0x61, 0x0000);
+  max_write_word_100(0xd4, (1<<13)|(3<<10)|(3<<5));
 
   uint16_t comm_stat = max_read_word(0x61);
   uint16_t status = max_read_word(0x00);
+
+  uint16_t packcfg = max_read_word_100(0xb5);
+
   uint16_t prot_status = max_read_word(0xd9);
   uint16_t prot_alert = max_read_word(0xaf);
   uint16_t prot_cfg2 = max_read_word_100(0xf1);
@@ -487,6 +507,7 @@ void max_dump() {
   float cell2 = max_word_to_mv(max_read_word(0xd7));
   float cell3 = max_word_to_mv(max_read_word(0xd6));
   float cell4 = max_word_to_mv(max_read_word(0xd5));
+  // this value looks good (checked with inducing voltages w/ power supply)
   float vpack = max_word_to_pack_mv(max_read_word(0xda));
 
   float temp = ((float)((int16_t)max_read_word(0x1b)))*(1.0/256.0);
@@ -507,6 +528,7 @@ void max_dump() {
 
   printf("  comm_stat: %04x\n", comm_stat);
 
+  printf("  packcfg: %04x\n", packcfg);
   printf("  status: %04x\n", status);
   if (status & 0x8000) {
     printf("  `-- prot alert\n");
@@ -845,7 +867,7 @@ void on_uart_rx() {
 }
 
 int main() {
-  set_sys_clock_48mhz();
+  //set_sys_clock_48mhz();
 
   stdio_init_all();
 
@@ -952,11 +974,11 @@ int main() {
 
   // https://www.reclaimerlabs.com/blog/2017/2/1/usb-c-for-engineers-part-3
 
+  sleep_ms(5000);
+
   printf("[pocket-sysctl] entering main loop.\n");
 
   while (true) {
-    sleep_ms(1);
-
     while (uart_is_readable(UART_ID)) {
       handle_commands(uart_getc(UART_ID));
     }
@@ -964,9 +986,10 @@ int main() {
     if (state == 0) {
       gpio_put(PIN_LED_R, 0);
       power_objects = 0;
+      request_sent = 0;
 
       // by default, we output 5V on VUSB
-      gpio_put(PIN_USB_SRC_ENABLE, 1);
+      gpio_put(PIN_USB_SRC_ENABLE, 1); // FIXME
 
       //printf("[pocket-sysctl] state 0\n");
       // probe FUSB302BMPX
@@ -974,41 +997,61 @@ int main() {
         // 1. set auto GoodCRC
         // AUTO_CRC in Switches1
         // Address: 03h; Reset Value: 0b0010_0000
-        // TODO: figure out CC direction?
 
         printf("[pocket-sysctl] FUSB probed.\n");
 
         fusb_write_byte(FUSB_RESET, FUSB_RESET_SW_RES);
+
+        sleep_us(10);
+
         // turn on all power
         fusb_write_byte(FUSB_POWER, 0x0F);
-        fusb_write_byte(FUSB_CONTROL3, 0x07);
+        // automatic retransmission
+        //fusb_write_byte(FUSB_CONTROL3, 0x07);
+        // AUTO_HARDRESET | AUTO_SOFTRESET | 3 retries | AUTO_RETRY
+        fusb_write_byte(FUSB_CONTROL3, (1<<4) | (1<<3) | (3<<1) | 1);
+        // flush rx buffer
         fusb_write_byte(FUSB_CONTROL1, FUSB_CONTROL1_RX_FLUSH);
 
+        // pdwn means pulldown. 0 = no pull down
+
         /* Measure CC1 */
-        fusb_write_byte(FUSB_SWITCHES0, 0x07);
+        fusb_write_byte(FUSB_SWITCHES0, 4|2|1); //  MEAS_CC1|PDWN2   |PDWN1
         sleep_us(250);
         uint8_t cc1 = fusb_read_byte(FUSB_STATUS0) & FUSB_STATUS0_BC_LVL;
 
         printf("[pocket-sysctl] CC1: %d\n", cc1);
 
         /* Measure CC2 */
-        fusb_write_byte(FUSB_SWITCHES0, 0x0B);
+        fusb_write_byte(FUSB_SWITCHES0, 8|2|1); //  MEAS_CC2|PDWN2   |PDWN1
         sleep_us(250);
         uint8_t cc2 = fusb_read_byte(FUSB_STATUS0) & FUSB_STATUS0_BC_LVL;
 
         printf("[pocket-sysctl] CC2: %d\n", cc2);
 
+        // cc1: 0, cc2: 3
+
+        // detect orientation
         if (cc1 > cc2) {
-          fusb_write_byte(FUSB_SWITCHES1, 0x25);
-          fusb_write_byte(FUSB_SWITCHES0, 0x07);
+          fusb_write_byte(FUSB_SWITCHES1,    4|1); //          |AUTO_CRC|TXCC1
+          fusb_write_byte(FUSB_SWITCHES0,  4|2|1); //  MEAS_CC1|PDWN2   |PDWN1
         } else {
-          fusb_write_byte(FUSB_SWITCHES1, 0x26);
-          fusb_write_byte(FUSB_SWITCHES0, 0x0B);
+          fusb_write_byte(FUSB_SWITCHES1,    4|2); //          |AUTO_CRC|TXCC2
+          fusb_write_byte(FUSB_SWITCHES0,  8|2|1); //  MEAS_CC2|PDWN2   |PDWN1
         }
 
         printf("[pocket-sysctl] switches set\n");
 
-        //fusb_write_byte(FUSB_RESET, FUSB_RESET_PD_RESET);
+        fusb_write_byte(FUSB_RESET, FUSB_RESET_PD_RESET);
+
+        // automatic soft reset
+        // FIXME
+        //fusb_write_byte(FUSB_CONTROL3, (1<<6) | (1<<4) | (1<<3) | (3<<1) | 1);
+        //sleep_ms(1);
+        //fusb_write_byte(FUSB_CONTROL3, (1<<4) | (1<<3) | (3<<1) | 1);
+
+        printf("[pocket-sysctl] auto hard/soft reset and retries set.\n");
+
         t = 0;
         state = 1;
       } else {
@@ -1019,37 +1062,40 @@ int main() {
       }
 
     } else if (state == 1) {
-      //printf("[pocket-sysctl] state 2\n");
+      //printf("[pocket-sysctl] state 1\n");
 
-      if (t>2000) {
-        printf("[pocket-sysctl] state 2, timeout, sleep\n");
-        // save power
-        sleep_ms(100);
-        t += 100;
-
-        // issue hard reset
-        fusb_write_byte(FUSB_CONTROL3, (1<<6) | 0x07);
-        sleep_ms(1);
-        fusb_write_byte(FUSB_CONTROL3, 0x07);
-
-        request_sent = 0;
-        state = 0;
+      if (t>3000) {
+        printf("[pocket-sysctl] state 1, timeout\n");
+        float input_voltage = charger_dump();
+        max_dump();
         t = 0;
+
+        // without batteries, the system dies here (brownout?)
+        // but the charger might have set up the requested voltage anyway
+        if (input_voltage < 6) {
+          fusb_write_byte(FUSB_CONTROL3, (1<<6) | (1<<4) | (1<<3) | (3<<1) | 1);
+          //sleep_ms(1);
+          fusb_write_byte(FUSB_CONTROL3, (1<<4) | (1<<3) | (3<<1) | 1);
+          state = 0;
+        } else {
+          state = 3;
+        }
       }
 
       int res = fusb_read_message(&rx_msg);
 
       if (!res) {
+        //printf("[pocket-sysctl] s1: charger responds, turning off USB_SRC\n");
         // if a charger is responding, turn off our 5V output
         gpio_put(PIN_USB_SRC_ENABLE, 0);
 
         uint8_t msgtype = PD_MSGTYPE_GET(&rx_msg);
         uint8_t numobj = PD_NUMOBJ_GET(&rx_msg);
-        printf("  msg type: %x numobj: %d\n", msgtype, numobj);
         if (msgtype == PD_MSGTYPE_SOURCE_CAPABILITIES) {
           int max_voltage = 0;
           for (int i=0; i<numobj; i++) {
             uint32_t pdo = rx_msg.obj[i];
+
             if ((pdo & PD_PDO_TYPE) == PD_PDO_TYPE_FIXED) {
               int voltage = print_src_fixed_pdo(pdo);
               if (voltage > max_voltage && voltage <= 20) {
@@ -1057,7 +1103,7 @@ int main() {
                 max_voltage = voltage;
               }
             } else {
-              printf("not a fixed PDO: %08x\n", pdo);
+              printf("[pocket-sysctl] s1: not a fixed PDO: %08x\n", pdo);
             }
           }
           if (!request_sent) {
@@ -1066,11 +1112,16 @@ int main() {
           }
         } else if (msgtype == PD_MSGTYPE_PS_RDY) {
           // power supply is ready
-          printf("[pocket-sysctl] power supply ready!\n");
+          printf("[pocket-sysctl] s1: power supply ready!\n");
           request_sent = 0;
           t = 0;
           state = 3;
+        } else {
+          printf("[pocket-sysctl] s1: msg type: %x numobj: %d\n", msgtype, numobj);
         }
+      } else {
+        //sleep_ms(1);
+        //printf("[pocket-sysctl] s1: no message\n");
       }
     } else if (state == 2) {
       printf("[pocket-sysctl] state 2, requesting PO %d\n", power_objects);
@@ -1088,33 +1139,37 @@ int main() {
 
       fusb_send_message(&tx);
 
-      printf("[pocket-sysctl] request sent.\n");
+      printf("[pocket-sysctl] s2: request sent.\n");
 
       tx_id_count++;
 
+      t = 0;
       request_sent = 1;
       state = 1;
     } else if (state == 3) {
       gpio_put(PIN_LED_R, 1);
+      gpio_put(PIN_USB_SRC_ENABLE, 0);
+
+      charger_configure();
+
+      // charging
+      sleep_ms(1);
 
       // running
       if (t>2000) {
         printf("[pocket-sysctl] state 3\n");
         //i2c_scan();
 
-        int renegotiate = charger_dump();
+        float input_voltage = charger_dump();
+        max_dump();
 
-        if (renegotiate) {
+        if (input_voltage < 6) {
+          printf("[pocket-sysctl] input voltage below 6v, renegotiate\n");
           state = 0;
         }
 
         t = 0;
       }
-    }
-
-    if (t_report>5000) {
-      max_dump();
-      t_report = 0;
     }
 
     t++;
