@@ -696,6 +696,10 @@ void turn_som_power_off() {
   gpio_put(PIN_PWREN_LATCH, 0);
 }
 
+void som_wake() {
+  uart_puts(uart0, "wake\r\n");
+}
+
 #define ST_EXPECT_DIGIT_0 0
 #define ST_EXPECT_DIGIT_1 1
 #define ST_EXPECT_DIGIT_2 2
@@ -824,6 +828,9 @@ void handle_commands(char chr) {
       else if (remote_cmd == 'w') {
         // TODO
         // wake SoC
+        som_wake();
+        sprintf(uart_buffer,"system: wake\r\n");
+        uart_puts(UART_ID, uart_buffer);
       }
       else if (remote_cmd == 'c') {
         // TODO
@@ -882,6 +889,13 @@ int main() {
   //irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
   //irq_set_enabled(UART_IRQ, true);
   //uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
+
+  uart_init(uart0, BAUD_RATE);
+  uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
+  uart_set_hw_flow(uart0, false, false);
+  uart_set_fifo_enabled(uart0, true);
+  gpio_set_function(PIN_SOM_UART_TX, GPIO_FUNC_UART);
+  gpio_set_function(PIN_SOM_UART_RX, GPIO_FUNC_UART);
 
   gpio_set_function(PIN_SDA, GPIO_FUNC_I2C);
   gpio_set_function(PIN_SCL, GPIO_FUNC_I2C);
