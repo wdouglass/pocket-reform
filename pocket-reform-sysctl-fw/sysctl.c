@@ -3,6 +3,7 @@
 #include "pico/binary_info.h"
 #include "pico/sleep.h"
 #include "hardware/i2c.h"
+#include "hardware/spi.h"
 #include "hardware/irq.h"
 #include "hardware/rtc.h"
 #include "fusb302b.h"
@@ -873,10 +874,26 @@ void on_uart_rx() {
   }
 }
 
+#define SPI_BUF_LEN 0x100
+uint8_t spi_out_buf[SPI_BUF_LEN];
+uint8_t spi_in_buf[SPI_BUF_LEN];
+void init_spi_client() {
+  spi_init(spi1, 1000 * 1000);
+  // we don't appreciate the wording, but it's the API we are given
+  spi_set_slave(spi1, true);
+  gpio_set_function(PIN_SOM_MOSI, GPIO_FUNC_SPI);
+  gpio_set_function(PIN_SOM_MISO, GPIO_FUNC_SPI);
+  gpio_set_function(PIN_SOM_SS0, GPIO_FUNC_SPI);
+  gpio_set_function(PIN_SOM_SCK, GPIO_FUNC_SPI);
+
+  printf("[init_spi_client] done.\n");
+}
+
 int main() {
   //set_sys_clock_48mhz();
 
   stdio_init_all();
+  init_spi_client();
 
   // UART to keyboard
   uart_init(UART_ID, BAUD_RATE);
@@ -890,6 +907,7 @@ int main() {
   //irq_set_enabled(UART_IRQ, true);
   //uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
 
+  // UART to som
   uart_init(uart0, BAUD_RATE);
   uart_set_format(uart0, DATA_BITS, STOP_BITS, PARITY);
   uart_set_hw_flow(uart0, false, false);
@@ -948,7 +966,7 @@ int main() {
   gpio_put(PIN_LED_B, 0);
 
   // TODO: actual SPI bus
-  gpio_init(PIN_SOM_MOSI);
+  /*gpio_init(PIN_SOM_MOSI);
   gpio_init(PIN_SOM_SS0);
   gpio_init(PIN_SOM_SCK);
   gpio_init(PIN_SOM_MISO);
@@ -959,7 +977,7 @@ int main() {
   gpio_put(PIN_SOM_MOSI, 0);
   gpio_put(PIN_SOM_SS0, 0);
   gpio_put(PIN_SOM_SCK, 0);
-  gpio_put(PIN_SOM_MISO, 0);
+  gpio_put(PIN_SOM_MISO, 0);*/
   //gpio_set_pulls(PIN_SOM_MOSI, 0, 0);
   //gpio_set_pulls(PIN_SOM_MISO, 0, 0);
   //gpio_set_pulls(PIN_SOM_SS0, 0, 0);
@@ -993,8 +1011,27 @@ int main() {
   printf("[pocket-sysctl] entering main loop.\n");
 
   while (true) {
+    // handle commands from keyboard
     while (uart_is_readable(UART_ID)) {
       handle_commands(uart_getc(UART_ID));
+    }
+
+    while (spi_is_readable(spi1)) {
+      // 0x01 is some "repeated tx data"
+      spi_read_blocking(spi1, 0x01, spi_in_buf, 1);
+      printf("[spi read] %02x\n", spi_in_buf[0]);
+    }
+
+    // handle commands over usb serial
+    int usb_c = getchar_timeout_us(0);
+    if (usb_c != PICO_ERROR_TIMEOUT) {
+      printf("[acm command] '%x'\n", usb_c);
+      if (usb_c == '1') {
+        turn_som_power_on();
+      }
+      else if (usb_c == '0') {
+        turn_som_power_off();
+      }
     }
 
     if (state == 0) {
