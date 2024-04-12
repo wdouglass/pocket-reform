@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "pico/sleep.h"
@@ -9,7 +10,10 @@
 #include "fusb302b.h"
 #include "pd.h"
 
-#define FW_REV "PREF1SYS D2 20231207"
+#define FW_STRING1 "PREF1SYS"
+#define FW_STRING2 "R1"
+#define FW_STRING3 "20240410"
+#define FW_REV FW_STRING1 FW_STRING2 FW_STRING3
 
 #define PIN_SDA 0
 #define PIN_SCL 1
@@ -58,6 +62,20 @@
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
 
+// battery information
+// TODO: turn into a struct
+// 4.8A x 3600 seconds/hour (per cell)
+#define MAX_CAPACITY (4.0)*3600.0
+float report_capacity_max_ampsecs =  MAX_CAPACITY;
+float report_capacity_accu_ampsecs = MAX_CAPACITY;
+float report_capacity_min_ampsecs = 0;
+int report_capacity_percentage = 0;
+float report_volts = 0;
+float report_current = 0;
+float report_cells_v[8] = {0,0,0,0,0,0,0,0};
+bool reached_full_charge = true; // FIXME
+bool som_is_powered = false;
+bool print_pack_info = false;
 
 void i2c_scan() {
   printf("\nI2C Scan\n");
@@ -451,10 +469,14 @@ float charger_dump() {
   uint8_t precharge_c = mps_read_byte(0x03);
   uint8_t bat_full_v = mps_read_byte(0x04);
 
-  int print_charger_info = 1;
-  if (print_charger_info) {
+  // carry over to globals for SPI reporting
+  report_current = -(adc_input_c - adc_discharge_c);
+  report_volts = adc_sys_v;
+
+  if (print_pack_info) {
     printf("[charger info]\n");
     printf("  status: %x\n", status);
+    printf("  reported current: %f voltage: %f\n", report_current, report_volts);
     printf("  fault: %x\n  ------------\n", fault);
 
     printf("  adc_bat_v: %f\n", adc_bat_v);
@@ -525,14 +547,21 @@ void max_dump() {
   float rep_time_to_empty = max_word_to_time(max_read_word(0x11));
   float rep_time_to_full = max_word_to_time(max_read_word(0x20));
 
-  printf("[pack info]\n");
+  // carry over to globals
+  report_capacity_percentage = (int)rep_percentage;
+  // charger mostly doesn't charge to >98%
+  if (report_capacity_percentage >= 98) report_capacity_percentage = 100;
+  report_cells_v[0] = cell1;
+  report_cells_v[1] = cell2;
 
-  printf("  comm_stat: %04x\n", comm_stat);
-
-  printf("  packcfg: %04x\n", packcfg);
-  printf("  status: %04x\n", status);
-  if (status & 0x8000) {
-    printf("  `-- prot alert\n");
+  if (print_pack_info) {
+    printf("[pack info]\n");
+    printf("  comm_stat: %04x\n", comm_stat);
+    printf("  packcfg: %04x\n", packcfg);
+    printf("  status: %04x\n", status);
+    if (status & 0x8000) {
+      printf("  `-- prot alert\n");
+    }
   }
   if (status & 0x0002) {
     printf("  `-- POR, clearing\n");
@@ -540,78 +569,80 @@ void max_dump() {
     max_write_word(0x61, 0x0000);
     max_write_word(0x00, status & (~0x0002));
   }
-  printf("  prot_alert: %04x\n", prot_alert);
-  printf("  prot_cfg2: %04x\n", prot_cfg2);
-  printf("  therm_cfg: %04x\n", therm_cfg);
-  printf("  temp: %f\n", temp);
-  printf("  die temp: %f\n", die_temp);
-  printf("  temp1: %f\n", temp1);
-  printf("  temp2: %f\n", temp2);
-  printf("  temp3: %f\n", temp3);
-  printf("  temp4: %f\n", temp4);
+  if (print_pack_info) {
+    printf("  prot_alert: %04x\n", prot_alert);
+    printf("  prot_cfg2: %04x\n", prot_cfg2);
+    printf("  therm_cfg: %04x\n", therm_cfg);
+    printf("  temp: %f\n", temp);
+    printf("  die temp: %f\n", die_temp);
+    printf("  temp1: %f\n", temp1);
+    printf("  temp2: %f\n", temp2);
+    printf("  temp3: %f\n", temp3);
+    printf("  temp4: %f\n", temp4);
 
-  printf("  prot_status: %04x\n", prot_status);
-  if (prot_status & (1<<14)) {
-    printf("  `-- too hot\n");
-  }
-  if (prot_status & (1<<13)) {
-    printf("  `-- full\n");
-  }
-  if (prot_status & (1<<12)) {
-    printf("  `-- too cold for charge\n");
-  }
-  if (prot_status & (1<<11)) {
-    printf("  `-- overvoltage\n");
-  }
-  if (prot_status & (1<<10)) {
-    printf("  `-- overcharge current\n");
-  }
-  if (prot_status & (1<<9)) {
-    printf("  `-- qoverflow\n");
-  }
-  if (prot_status & (1<<8)) {
-    printf("  `-- prequal timeout\n");
-  }
-  if (prot_status & (1<<7)) {
-    printf("  `-- imbalance\n");
-  }
-  if (prot_status & (1<<6)) {
-    printf("  `-- perm fail\n");
-  }
-  if (prot_status & (1<<5)) {
-    printf("  `-- die hot\n");
-  }
-  if (prot_status & (1<<4)) {
-    printf("  `-- too hot for discharge\n");
-  }
-  if (prot_status & (1<<3)) {
-    printf("  `-- undervoltage\n");
-  }
-  if (prot_status & (1<<2)) {
-    printf("  `-- overdischarge current\n");
-  }
-  if (prot_status & (1<<1)) {
-    printf("  `-- resdfault\n");
-  }
-  if (prot_status & (1<<0)) {
-    printf("  `-- ship\n");
-  }
+    printf("  prot_status: %04x\n", prot_status);
+    if (prot_status & (1<<14)) {
+      printf("  `-- too hot\n");
+    }
+    if (prot_status & (1<<13)) {
+      printf("  `-- full\n");
+    }
+    if (prot_status & (1<<12)) {
+      printf("  `-- too cold for charge\n");
+    }
+    if (prot_status & (1<<11)) {
+      printf("  `-- overvoltage\n");
+    }
+    if (prot_status & (1<<10)) {
+      printf("  `-- overcharge current\n");
+    }
+    if (prot_status & (1<<9)) {
+      printf("  `-- qoverflow\n");
+    }
+    if (prot_status & (1<<8)) {
+      printf("  `-- prequal timeout\n");
+    }
+    if (prot_status & (1<<7)) {
+      printf("  `-- imbalance\n");
+    }
+    if (prot_status & (1<<6)) {
+      printf("  `-- perm fail\n");
+    }
+    if (prot_status & (1<<5)) {
+      printf("  `-- die hot\n");
+    }
+    if (prot_status & (1<<4)) {
+      printf("  `-- too hot for discharge\n");
+    }
+    if (prot_status & (1<<3)) {
+      printf("  `-- undervoltage\n");
+    }
+    if (prot_status & (1<<2)) {
+      printf("  `-- overdischarge current\n");
+    }
+    if (prot_status & (1<<1)) {
+      printf("  `-- resdfault\n");
+    }
+    if (prot_status & (1<<0)) {
+      printf("  `-- ship\n");
+    }
 
-  printf("  vcell: %f\n", vcell);
-  printf("  avg_vcell: %f\n", avg_vcell);
-  printf("  cell1: %f\n", cell1);
-  printf("  cell2: %f\n", cell2);
-  printf("  cell3: %f\n", cell3);
-  printf("  cell4: %f\n", cell4);
-  printf("  vpack: %f\n", vpack);
+    printf("  vcell: %f\n", vcell);
+    printf("  avg_vcell: %f\n", avg_vcell);
+    printf("  cell1: %f\n", cell1);
+    printf("  cell2: %f\n", cell2);
+    printf("  cell3: %f\n", cell3);
+    printf("  cell4: %f\n", cell4);
+    printf("  vpack: %f\n", vpack);
 
-  printf("  rep_capacity: %f mAh\n", rep_capacity);
-  printf("  rep_percentage: %f %\n", rep_percentage);
-  printf("  rep_age: %f %\n", rep_age);
-  printf("  rep_full_capacity: %f mAh\n", rep_full_capacity);
-  printf("  rep_time_to_empty: %f s\n", rep_time_to_empty);
-  printf("  rep_time_to_full: %f s\n", rep_time_to_full);
-  printf("  ============\n");
+    printf("  rep_capacity: %f mAh\n", rep_capacity);
+    printf("  rep_percentage: %f %\n", rep_percentage);
+    printf("  rep_age: %f %\n", rep_age);
+    printf("  rep_full_capacity: %f mAh\n", rep_full_capacity);
+    printf("  rep_time_to_empty: %f s\n", rep_time_to_empty);
+    printf("  rep_time_to_full: %f s\n", rep_time_to_full);
+    printf("  ============\n");
+  }
 
   char report[128];
   sprintf(report, "%04d %05d %05d %06d %06d\r\n",
@@ -623,8 +654,8 @@ void max_dump() {
 
   uart_puts(UART_ID, report);
 
-  printf("  report: %s", report);
-  printf("  ============\n");
+  //printf("  report: %s", report);
+  //printf("  ============\n");
 }
 
 void turn_som_power_on() {
@@ -663,6 +694,8 @@ void turn_som_power_on() {
 
   // done with latching
   gpio_put(PIN_PWREN_LATCH, 0);
+
+  som_is_powered = true;
 }
 
 void turn_som_power_off() {
@@ -695,6 +728,8 @@ void turn_som_power_off() {
 
   // done with latching
   gpio_put(PIN_PWREN_LATCH, 0);
+
+  som_is_powered = false;
 }
 
 void som_wake() {
@@ -708,6 +743,7 @@ void som_wake() {
 #define ST_EXPECT_CMD     4
 #define ST_SYNTAX_ERROR   5
 #define ST_EXPECT_RETURN  6
+#define ST_EXPECT_MAGIC   7
 
 char remote_cmd = 0;
 uint8_t remote_arg = 0;
@@ -819,7 +855,7 @@ void handle_commands(char chr) {
       }
       else if (remote_cmd == 's') {
         // TODO
-        sprintf(uart_buffer,FW_REV"normal,%d,%d,%d\r",0,0,0);
+        sprintf(uart_buffer,FW_REV"normal,%d,%d,%d\r\n",0,0,0);
         uart_puts(UART_ID, uart_buffer);
       }
       else if (remote_cmd == 'u') {
@@ -836,7 +872,30 @@ void handle_commands(char chr) {
       else if (remote_cmd == 'c') {
         // TODO
         // get status of cells, current, voltage, fuel gauge
-        sprintf(uart_buffer, "%d\r\n", 0);
+        int mA = (int)(report_current*1000.0);
+        char mA_sign = ' ';
+        if (mA<0) {
+          mA = -mA;
+          mA_sign = '-';
+        }
+        int mV = (int)(report_volts*1000.0);
+        sprintf(uart_buffer,"%02d %02d %02d %02d %02d %02d %02d %02d mA%c%04dmV%05d %3d%% P%d\r\n",
+                (int)(report_cells_v[0]/100),
+                (int)(report_cells_v[1]/100),
+                (int)(report_cells_v[2]/100),
+                (int)(report_cells_v[3]/100),
+                (int)(report_cells_v[4]/100),
+                (int)(report_cells_v[5]/100),
+                (int)(report_cells_v[6]/100),
+                (int)(report_cells_v[7]/100),
+                mA_sign,
+                mA,
+                mV,
+                report_capacity_percentage,
+                som_is_powered?1:0);
+
+        printf("[gauge] [%s]\n", uart_buffer);
+
         uart_puts(UART_ID, uart_buffer);
       }
       else if (remote_cmd == 'S') {
@@ -868,25 +927,194 @@ void handle_commands(char chr) {
   }
 }
 
-void on_uart_rx() {
-  while (uart_is_readable(UART_ID)) {
-    handle_commands(uart_getc(UART_ID));
-  }
-}
+#define SPI_BUF_LEN 0x8
+uint8_t spi_buf[SPI_BUF_LEN];
+unsigned char spi_cmd_state = ST_EXPECT_MAGIC;
+unsigned char spi_command = '\0';
+uint8_t spi_arg1 = 0;
 
-#define SPI_BUF_LEN 0x100
-uint8_t spi_out_buf[SPI_BUF_LEN];
-uint8_t spi_in_buf[SPI_BUF_LEN];
 void init_spi_client() {
-  spi_init(spi1, 1000 * 1000);
-  // we don't appreciate the wording, but it's the API we are given
-  spi_set_slave(spi1, true);
   gpio_set_function(PIN_SOM_MOSI, GPIO_FUNC_SPI);
   gpio_set_function(PIN_SOM_MISO, GPIO_FUNC_SPI);
   gpio_set_function(PIN_SOM_SS0, GPIO_FUNC_SPI);
   gpio_set_function(PIN_SOM_SCK, GPIO_FUNC_SPI);
 
+  spi_init(spi1, 400 * 1000);
+  // we don't appreciate the wording, but it's the API we are given
+  spi_set_slave(spi1, true);
+  spi_set_format(spi1, 8, SPI_CPOL_0, SPI_CPHA_1, SPI_MSB_FIRST);
+
   printf("[init_spi_client] done.\n");
+}
+
+/**
+ * @brief SPI command from imx poll function
+ *
+ * Ported from MNT Reform reform2-lpc-fw.
+ */
+void handle_spi_commands() {
+  int len = 0;
+  int all_zeroes = 1;
+
+  while (spi_is_readable(spi1) && len < SPI_BUF_LEN) {
+    // 0x00 is some "repeated tx data"
+    spi_read_blocking(spi1, 0x00, &spi_buf[len], 1);
+    if (spi_buf[len] != 0) all_zeroes = 0;
+    len++;
+  }
+
+  if (len == 0) {
+    return;
+  }
+
+  printf("[spi] rx len: %d, %02x %02x %02x %02x %02x %02x %02x %02x\n", len, spi_buf[0], spi_buf[1], spi_buf[2], spi_buf[3], spi_buf[4], spi_buf[5], spi_buf[6], spi_buf[7]);
+
+  // states:
+  // 0   arg1 byte expected
+  // 4   command byte expected
+  // 6   execute command
+  // 7   magic byte expected
+  for (uint8_t s = 0; s < len; s++) {
+    if (spi_cmd_state == ST_EXPECT_MAGIC) {
+      // magic byte found, prevents garbage data
+      // in the bus from triggering a command
+      if (spi_buf[s] == 0xB5) {
+        spi_cmd_state = ST_EXPECT_CMD;
+      }
+    }
+    else if (spi_cmd_state == ST_EXPECT_CMD) {
+      // read command
+      spi_command = spi_buf[s];
+      spi_cmd_state = ST_EXPECT_DIGIT_0;
+    }
+    else if (spi_cmd_state == ST_EXPECT_DIGIT_0) {
+      // read arg1 byte
+      spi_arg1 = spi_buf[s];
+      spi_cmd_state = ST_EXPECT_RETURN;
+    }
+  }
+
+  if (spi_cmd_state == ST_EXPECT_MAGIC && !all_zeroes) {
+    // reset SPI0 block
+    // this is a workaround for confusion with
+    // software spi from BPI-CM4 where we get
+    // bit-shifted bytes
+
+    // FIXME
+    init_spi_client();
+  }
+
+  if (spi_cmd_state != ST_EXPECT_RETURN) {
+    // waiting for more data
+    return;
+  }
+
+  printf("[spi] exec:%c,%02x\r\n", spi_command, spi_arg1);
+
+  // clear receive buffer, reuse as send buffer
+  memset(spi_buf, 0, SPI_BUF_LEN);
+
+  // execute power state command
+  if (spi_command == 'p') {
+    // toggle system power and/or reset imx
+    if (spi_arg1 == 1) {
+      turn_som_power_off();
+      init_spi_client();
+      return;
+    }
+    if (spi_arg1 == 2) {
+      turn_som_power_on();
+      init_spi_client();
+      return;
+    }
+    if (spi_arg1 == 3) {
+      // TODO
+      //reset_som();
+    }
+
+    spi_buf[0] = som_is_powered;
+  }
+  // return firmware version and api info
+  else if (spi_command == 'f') {
+    if(spi_arg1 == 0) {
+      memcpy(spi_buf, FW_STRING1, 8);
+    }
+    else if(spi_arg1 == 1) {
+      memcpy(spi_buf, FW_STRING2, 2);
+    }
+    else {
+      memcpy(spi_buf, FW_STRING3, 8);
+    }
+  }
+  // execute status query command
+  else if (spi_command == 'q') {
+    uint8_t percentage = (uint8_t)report_capacity_percentage;
+    int16_t voltsInt = (int16_t)(report_volts*1000.0);
+    int16_t currentInt = (int16_t)(report_current*1000.0);
+
+    spi_buf[0] = (uint8_t)voltsInt;
+    spi_buf[1] = (uint8_t)(voltsInt >> 8);
+    spi_buf[2] = (uint8_t)currentInt;
+    spi_buf[3] = (uint8_t)(currentInt >> 8);
+    spi_buf[4] = (uint8_t)percentage;
+    spi_buf[5] = (uint8_t)0; // TODO "state" not implemented
+    spi_buf[6] = (uint8_t)0;
+  }
+  // get cell voltage
+  else if (spi_command == 'v') {
+    uint16_t volts = 0;
+    uint8_t cell1 = 0;
+
+    if (spi_arg1 == 1) {
+      cell1 = 4;
+    }
+
+    for (uint8_t c = 0; c < 4; c++) {
+      volts = report_cells_v[c + cell1];
+      spi_buf[c*2] = (uint8_t)volts;
+      spi_buf[(c*2)+1] = (uint8_t)(volts >> 8);
+    }
+  }
+  // get calculated capacity
+  else if (spi_command == 'c') {
+    uint16_t cap_accu = (uint16_t) report_capacity_max_ampsecs / 3.6;
+    uint16_t cap_min = (uint16_t) report_capacity_min_ampsecs / 3.6;
+    uint16_t cap_max = (uint16_t) report_capacity_max_ampsecs / 3.6;
+
+    spi_buf[0] = (uint8_t)cap_accu;
+    spi_buf[1] = (uint8_t)(cap_accu >> 8);
+    spi_buf[2] = (uint8_t)cap_min;
+    spi_buf[3] = (uint8_t)(cap_min >> 8);
+    spi_buf[4] = (uint8_t)cap_max;
+    spi_buf[5] = (uint8_t)(cap_max >> 8);
+  }
+  else if (spi_command == 'u') {
+    // not implemented
+  }
+
+  // FIXME: if we don't reset, SPI wants to transact the amount of bytes
+  // that we read above for unknown reasons
+  init_spi_client();
+
+  spi_write_blocking(spi1, spi_buf, SPI_BUF_LEN);
+
+  // clear any pending reads
+  /*while (spi_is_readable(spi1)) {
+    printf("[spi] clearing rx...\n");
+    spi_read_blocking(spi1, 0x00, &spi_buf[0], 1);
+  }*/
+
+  spi_cmd_state = ST_EXPECT_MAGIC;
+  spi_command = 0;
+  spi_arg1 = 0;
+
+  return;
+}
+
+void on_uart_rx() {
+  while (uart_is_readable(UART_ID)) {
+    handle_commands(uart_getc(UART_ID));
+  }
 }
 
 int main() {
@@ -987,9 +1215,11 @@ int main() {
   gpio_set_dir(PIN_USB_SRC_ENABLE, 1);
   gpio_put(PIN_USB_SRC_ENABLE, 0);
 
+  turn_som_power_on();
+
   // latch the PWR and display pins
-  gpio_put(PIN_PWREN_LATCH, 1);
-  gpio_put(PIN_PWREN_LATCH, 0);
+  //gpio_put(PIN_PWREN_LATCH, 1);
+  //gpio_put(PIN_PWREN_LATCH, 0);
 
   unsigned int t = 0;
   unsigned int t_report = 0;
@@ -1016,11 +1246,7 @@ int main() {
       handle_commands(uart_getc(UART_ID));
     }
 
-    while (spi_is_readable(spi1)) {
-      // 0x01 is some "repeated tx data"
-      spi_read_blocking(spi1, 0x01, spi_in_buf, 1);
-      printf("[spi read] %02x\n", spi_in_buf[0]);
-    }
+    handle_spi_commands();
 
     // handle commands over usb serial
     int usb_c = getchar_timeout_us(0);
@@ -1031,6 +1257,9 @@ int main() {
       }
       else if (usb_c == '0') {
         turn_som_power_off();
+      }
+      else if (usb_c == 'p') {
+        print_pack_info = !print_pack_info;
       }
     }
 
