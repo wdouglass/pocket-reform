@@ -17,6 +17,8 @@ target_sources(${PROJECT} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/usb_descriptors.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/oled.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/remote.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/menu.c
         )
 
 # Example include

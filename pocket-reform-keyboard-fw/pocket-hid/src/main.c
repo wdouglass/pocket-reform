@@ -1,27 +1,8 @@
 /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2019 Ha Thach (tinyusb.org)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2019 Ha Thach (tinyusb.org)
+  Copyright (c) 2021-2024 MNT Research GmbH (mntre.com)
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,6 +20,9 @@
 
 #include "usb_descriptors.h"
 #include "oled.h"
+#include "menu.h"
+#include "remote.h"
+#include "keyboard.h"
 
 #include "ws2812.pio.h"
 
@@ -86,12 +70,6 @@ static int pressed_keys = 0;
 static volatile uint32_t led_value = 0;
 
 void hid_task(void);
-void led_set(uint32_t rgb);
-void led_task(uint32_t rgb);
-void led_mod_hue(int d);
-void led_mod_brightness(int d);
-void led_set_brightness(int b);
-void led_cycle_hue();
 int process_keyboard(uint8_t* resulting_scancodes);
 
 #define UART_ID uart1
@@ -99,75 +77,6 @@ int process_keyboard(uint8_t* resulting_scancodes);
 #define DATA_BITS 8
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
-
-static char uart_rx_line[128];
-static int uart_rx_i=0;
-
-void insert_bat_icon(char* str, int x, float v) {
-  char icon = 0;
-  if (v>=80) {
-    icon = 8;
-  } else if (v>=60) {
-    icon = 6;
-  } else if (v>=40) {
-    icon = 4;
-  } else if (v>=20) {
-    icon = 2;
-  } else {
-    icon = 0;
-  }
-  str[x]   = 4*32+icon;
-  str[x+1] = 4*32+icon+1;
-}
-
-void on_uart_rx() {
-  while (uart_is_readable(UART_ID)) {
-    char c = uart_getc(UART_ID);
-    if (uart_rx_i<127) {
-      uart_rx_line[uart_rx_i++] = c;
-      uart_rx_line[uart_rx_i] = 0;
-    } else {
-      uart_rx_i = 0;
-    }
-    if (c == '\n') {
-      // TODO hack
-
-      if (uart_rx_i>6) {
-        gfx_clear();
-        //gfx_poke_str(0, 3, uart_rx_line);
-        // cut off after 4 digits
-        uart_rx_line[4] = 0;
-        float percentage = ((float)atoi(uart_rx_line))/(float)10.0;
-
-        char batinfo[32];
-        sprintf(batinfo, "   %.1f%%", (double)percentage);
-        insert_bat_icon(batinfo, 0, percentage);
-        gfx_poke_str(7, 1, batinfo);
-        gfx_flush();
-      }
-      uart_rx_i = 0;
-    }
-  }
-}
-
-void anim_hello(void) {
-  gfx_clear();
-  gfx_on();
-  for (int y=0; y<3; y++) {
-    for (int x=0; x<12; x++) {
-      gfx_poke((uint8_t)(x+4),(uint8_t)(y+1),(uint8_t)((5+y)*32+x));
-    }
-    gfx_flush();
-  }
-  for (uint8_t y=0; y<0xff; y++) {
-    gfx_contrast(y);
-    sleep_ms(0);
-  }
-  for (uint8_t y=0; y<0xff; y++) {
-    gfx_contrast(0xff-y);
-    sleep_ms(0);
-  }
-}
 
 /*------------- MAIN -------------*/
 int main(void)
@@ -191,40 +100,28 @@ int main(void)
 
   gpio_init(PIN_COL1);
   gpio_set_dir(PIN_COL1, true);
-  //gpio_pull_up(PIN_COL1);
   gpio_init(PIN_COL2);
   gpio_set_dir(PIN_COL2, true);
-  //gpio_pull_up(PIN_COL2);
   gpio_init(PIN_COL3);
   gpio_set_dir(PIN_COL3, true);
-  //gpio_pull_up(PIN_COL3);
   gpio_init(PIN_COL4);
   gpio_set_dir(PIN_COL4, true);
-  //gpio_pull_up(PIN_COL4);
   gpio_init(PIN_COL5);
   gpio_set_dir(PIN_COL5, true);
-  //gpio_pull_up(PIN_COL5);
   gpio_init(PIN_COL6);
   gpio_set_dir(PIN_COL6, true);
-  //gpio_pull_up(PIN_COL6);
   gpio_init(PIN_COL7);
   gpio_set_dir(PIN_COL7, true);
-  //gpio_pull_up(PIN_COL7);
   gpio_init(PIN_COL8);
   gpio_set_dir(PIN_COL8, true);
-  //gpio_pull_up(PIN_COL8);
   gpio_init(PIN_COL9);
   gpio_set_dir(PIN_COL9, true);
-  //gpio_pull_up(PIN_COL9);
   gpio_init(PIN_COL10);
   gpio_set_dir(PIN_COL10, true);
-  //gpio_pull_up(PIN_COL10);
   gpio_init(PIN_COL11);
   gpio_set_dir(PIN_COL11, true);
-  //gpio_pull_up(PIN_COL11);
   gpio_init(PIN_COL12);
   gpio_set_dir(PIN_COL12, true);
-  //gpio_pull_up(PIN_COL12);
 
   gpio_init(PIN_ROW1);
   gpio_set_dir(PIN_ROW1, false);
@@ -267,11 +164,12 @@ int main(void)
   led_set_brightness(0x0);
 
   gfx_init(false);
-  anim_hello();
+  //anim_hello();
 
-  irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
+  irq_set_exclusive_handler(UART_IRQ, remote_on_uart_rx);
   irq_set_enabled(UART_IRQ, true);
-  uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
+  // bool rx_has_data, bool tx_needs_data
+  uart_set_irq_enables(UART_ID, true, false);
 
   while (1) {
     pressed_keys = process_keyboard(pressed_scancodes);
@@ -351,31 +249,38 @@ bool tud_hid_trackball_report(uint8_t report_id,
 
 uint8_t matrix_debounce[KBD_COLS*KBD_ROWS];
 uint8_t matrix_state[KBD_COLS*KBD_ROWS];
+
 int active_meta_mode = 0;
 uint8_t last_meta_key = 0;
+
 uint8_t* active_matrix = matrix;
 bool media_toggle = 0;
 bool fn_key = 0; // Am I holding FN?
 bool circle = 0; // Am I holding circle?
 
-int command_sent = 0;
-int soc_power_on = 0; // fixme
-
-void remote_turn_on_som() {
-  uart_puts(UART_ID, "\r\n1p\r\n");
-  led_set_brightness(10);
-  soc_power_on = 1;
+// enter the menu
+void enter_meta_mode(void) {
+  active_meta_mode = 1;
+  reset_and_render_menu();
+  if (!remote_get_power_state()) {
+    led_set_brightness(10);
+  }
 }
 
-void remote_turn_off_som() {
-  uart_puts(UART_ID, "\r\n0p\r\n");
-  led_set_brightness(0);
-  soc_power_on = 0;
+void exit_meta_mode(void) {
+  active_meta_mode = 0;
+  if (!remote_get_power_state()) {
+    led_set_brightness(0);
+  }
 }
 
-void remote_wake_som() {
-  uart_puts(UART_ID, "\r\n1w\r\n");
-  anim_hello();
+void reset_keyboard_state(void) {
+  for (int i = 0; i < KBD_COLS*KBD_ROWS; i++) {
+    matrix_debounce[i] = 0;
+    matrix_state[i] = 0;
+  }
+  last_meta_key = 0;
+  reset_menu();
 }
 
 int process_keyboard(uint8_t* resulting_scancodes) {
@@ -450,17 +355,10 @@ int process_keyboard(uint8_t* resulting_scancodes) {
       if (debounced_pressed) {
         total_pressed++;
 
-        // Is circle key pressed?
-        // FIXME HACK
-
-        if (keycode == KEY_ENTER && fn_key && !command_sent) {
-          if (!soc_power_on) {
-            remote_turn_on_som();
-            command_sent = 1;
-            //anim_hello();
-          } else {
-            remote_turn_off_som();
-            command_sent = 1;
+        // hyper + enter? open OLED menu
+        if (keycode == KEY_ENTER && fn_key) {
+          if (!active_meta_mode && !last_meta_key) {
+            enter_meta_mode();
           }
         } else if (keycode == KEY_F12) {
           remote_wake_som();
@@ -472,19 +370,19 @@ int process_keyboard(uint8_t* resulting_scancodes) {
             // not holding the same key?
             if (last_meta_key != keycode) {
               // hyper/circle/menu functions
-              int stay_meta = 0; //execute_meta_function(keycode);
+              int stay_meta = execute_meta_function(keycode);
               // don't repeat action while key is held down
               last_meta_key = keycode;
 
               // exit meta mode
               if (!stay_meta) {
-                active_meta_mode = 0;
+                exit_meta_mode();
               }
 
               // after wake-up from sleep mode, skip further keymap processing
               if (stay_meta == 2) {
-                //reset_keyboard_state();
-                //enter_meta_mode();
+                reset_keyboard_state();
+                enter_meta_mode();
                 return 0;
               }
             }
@@ -499,7 +397,6 @@ int process_keyboard(uint8_t* resulting_scancodes) {
       } else {
         // key not pressed
         if (keycode == KEY_COMPOSE) {
-          command_sent = 0;
           fn_key = 0;
           active_matrix = matrix;
         }
@@ -518,75 +415,84 @@ int prev_buttons = 0;
 int scroll_toggle = 0;
 int prev_num_keys = 0;
 
+int8_t tb_nx = 0;
+int8_t tb_ny = 0;
+int tb_btn1 = 0;
+int tb_btn2 = 0;
+int tb_btn3 = 0;
+int tb_btn4 = 0;
+
+// returns motion yes/no
+static int poll_trackball()
+{
+  tb_btn3 = matrix_state[KBD_COLS*5+3]>0;
+  tb_btn1 = matrix_state[KBD_COLS*5+4]>0;
+  tb_btn2 = matrix_state[KBD_COLS*5+7]>0;
+  tb_btn4 = matrix_state[KBD_COLS*5+8]>0;
+
+  uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
+
+  buf[0] = 0x02;
+
+  i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
+  i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 1, false, make_timeout_time_ms(2));
+
+  if (buf[0] & 0xf0) {
+    buf[0] = 0x03;
+    i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
+    i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 2, false, make_timeout_time_ms(2));
+
+    tb_nx = (int8_t)buf[0];
+    tb_ny = (int8_t)buf[1];
+
+    // HACK hue/value wheel
+    if (matrix_state[KBD_COLS*4+0]) {
+      if (tb_ny) {
+        // shift held? saturation
+        if (matrix_state[KBD_COLS*3+0]) {
+          led_mod_saturation(tb_ny);
+        } else {
+          led_mod_brightness(tb_ny);
+        }
+      }
+      if (tb_nx) {
+        led_mod_hue(tb_nx);
+      }
+    }
+
+    return 1;
+  }
+  return 0;
+}
+
 static void send_hid_report(uint8_t report_id)
 {
   // skip if hid is not ready yet
-  if ( !tud_hid_ready() ) return;
+  if (!tud_hid_ready()) return;
 
   switch (report_id) {
     case REPORT_ID_KEYBOARD:
     {
-      //int num_keys = process_keyboard(pressed_scancodes);
-
-      //if (num_keys > 0) {
-        tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, pressed_scancodes);
-        //} else {
-        // send empty key report if previously has key pressed
-        //if (prev_num_keys) tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, NULL);
-        //}
+      tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, pressed_scancodes);
       prev_num_keys = pressed_keys;
     }
     break;
 
     case REPORT_ID_MOUSE:
     {
-      uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
+      int buttons = tb_btn1 | (tb_btn2<<1) | (tb_btn4<<2);
+      int motion = poll_trackball();
 
-      buf[0] = 0x02;
-
-      i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
-      i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 1, false, make_timeout_time_ms(2));
-      //i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
-      //i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 1, false);
-
-      int btn3 = matrix_state[KBD_COLS*5+3]>0;
-      int btn1 = matrix_state[KBD_COLS*5+4]>0;
-      int btn2 = matrix_state[KBD_COLS*5+7]>0;
-      int btn4 = matrix_state[KBD_COLS*5+8]>0;
-
-      int buttons = btn1 | (btn2<<1) | (btn4<<2);
-
-      if (buf[0] & 0xf0) {
-        buf[0] = 0x03;
-        //i2c_write_blocking(i2c0, ADDR_SENSOR, buf, 1, true);
-        //i2c_read_blocking(i2c0, ADDR_SENSOR, buf, 2, false);
-        i2c_write_blocking_until(i2c0, ADDR_SENSOR, buf, 1, true, make_timeout_time_ms(2));
-        i2c_read_blocking_until(i2c0, ADDR_SENSOR, buf, 2, false, make_timeout_time_ms(2));
-
-        int8_t nx = (int8_t)buf[0];
-        int8_t ny = (int8_t)buf[1];
-
+      if (motion) {
         // no button, right + down, no scroll pan
-        if (btn3 || scroll_toggle) {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 2*ny, -2*nx);
+        if (tb_btn3 || scroll_toggle) {
+          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 2*tb_ny, -2*tb_nx);
         } else {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*nx, -2*ny, 0, 0);
-        }
-
-        // HACK hue/value wheel
-        if (matrix_state[KBD_COLS*4+0]) {
-          if (ny) {
-            led_mod_brightness(ny);
-          }
-          if (nx) {
-            led_mod_hue(nx);
-          }
+          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*tb_nx, -2*tb_ny, 0, 0);
         }
 
       } else {
-        //if (buttons != prev_buttons) {
-          tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
-          //}
+        tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
       }
 
       prev_buttons = buttons;
@@ -616,29 +522,7 @@ static void send_hid_report(uint8_t report_id)
 
     case REPORT_ID_GAMEPAD:
     {
-      // use to avoid send multiple consecutive zero report for keyboard
-      /*static bool has_gamepad_key = false;
-
-      hid_gamepad_report_t report =
-      {
-        .x   = 0, .y = 0, .z = 0, .rz = 0, .rx = 0, .ry = 0,
-        .hat = 0, .buttons = 0
-      };
-
-      if ( btn )
-      {
-        report.hat = GAMEPAD_HAT_UP;
-        report.buttons = GAMEPAD_BUTTON_A;
-        tud_hid_report(REPORT_ID_GAMEPAD, &report, sizeof(report));
-
-        has_gamepad_key = true;
-      }else
-      {
-        report.hat = GAMEPAD_HAT_CENTERED;
-        report.buttons = 0;
-        if (has_gamepad_key) tud_hid_report(REPORT_ID_GAMEPAD, &report, sizeof(report));
-        has_gamepad_key = false;
-        }*/
+      // TODO: later
     }
     break;
 
@@ -687,6 +571,9 @@ void led_bitmap(uint8_t row, const uint8_t* row_rgb) {
   }
 }
 
+
+int hid_task_counter = 0;
+
 // Every 10ms, we will sent 1 report for each HID profile (keyboard, mouse etc ..)
 // tud_hid_report_complete_cb() is used to send the next report after previous one is complete
 void hid_task(void)
@@ -695,11 +582,21 @@ void hid_task(void)
   const uint32_t interval_ms = 10;
   static uint32_t start_ms = 0;
 
-  if ( board_millis() - start_ms < interval_ms) return; // not enough time
+  if (board_millis() - start_ms < interval_ms) {
+    // not enough time passed
+    return;
+  }
   start_ms += interval_ms;
 
+  // allow trackball backlight control even if there's no USB yet
+  if (hid_task_counter%10 == 0) {
+    if (tud_suspended() && remote_get_power_state()) {
+      poll_trackball();
+    }
+  }
+
   // Remote wakeup
-  if ( tud_suspended() && pressed_keycodes[0] )
+  if (tud_suspended() && pressed_keys > 0)
   {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
@@ -708,9 +605,15 @@ void hid_task(void)
     // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
     send_hid_report(REPORT_ID_KEYBOARD);
   }
+
+  hid_task_counter++;
+  if (hid_task_counter%100 == 0) {
+    refresh_menu_page();
+  }
 }
 
 int led_brightness = 0;
+int led_saturation = 255;
 int led_hue = 127;
 
 typedef struct RgbColor
@@ -780,7 +683,7 @@ void led_set_hsv() {
   HsvColor hsv;
   RgbColor rgb;
   hsv.h = (unsigned char)led_hue;
-  hsv.s = 0xff;
+  hsv.s = (unsigned char)led_saturation;
   hsv.v = (unsigned char)led_brightness;
 
   rgb = HsvToRgb(hsv);
@@ -801,6 +704,17 @@ void led_mod_hue(int d) {
   led_set_hsv();
 }
 
+void led_mod_saturation(int d) {
+  led_saturation+=d;
+  if (led_saturation>0xff) led_saturation = 0xff;
+  if (led_saturation<0) led_saturation = 0;
+  led_set_hsv();
+}
+
+void led_set_saturation(int s) {
+  led_saturation = s;
+}
+
 void led_set_brightness(int b) {
   led_brightness = b;
   led_set_hsv();
@@ -811,7 +725,6 @@ void led_cycle_hue() {
   if (led_hue>0xff) led_hue = 0;
   led_set_hsv();
 }
-
 
 // Invoked when sent REPORT successfully to host
 // Application can use this to send the next report
@@ -928,7 +841,8 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
         led_task(pixel_grb);
       }
       else if (cmd == strnstr(cmd, CMD_LOGO, 4)) {
-        anim_hello();
+        // FIXME
+        //anim_hello();
       }
       else if (cmd == strnstr(cmd, CMD_OLED_BRITE, 4)) {
         uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
@@ -959,5 +873,5 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
 
       //uint8_t const kbd_leds = buffer[0];
     }
-    }*/
+  }*/
 }
