@@ -852,14 +852,12 @@ void handle_commands(char chr) {
         // turn reporting to i.MX on or off
       }
       else if (remote_cmd == 'w') {
-        // TODO
         // wake SoC
         som_wake();
         sprintf(uart_buffer,"system: wake\r\n");
         uart_puts(UART_ID, uart_buffer);
       }
       else if (remote_cmd == 'c') {
-        // TODO
         // get status of cells, current, voltage, fuel gauge
         int mA = (int)(report_current*1000.0);
         char mA_sign = ' ';
