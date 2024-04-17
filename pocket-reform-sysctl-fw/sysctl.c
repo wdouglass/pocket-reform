@@ -1,3 +1,12 @@
+/*
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform System Controller Firmware for RP2040
+  Copyright 2023-2024 MNT Research GmbH
+  
+  fusb_read/write functions based on:
+  https://git.clarahobbs.com/pd-buddy/pd-buddy-firmware/src/branch/master/lib/src/fusb302b.c
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include "pico/stdlib.h"
@@ -12,7 +21,7 @@
 
 #define FW_STRING1 "PREF1SYS"
 #define FW_STRING2 "R1"
-#define FW_STRING3 "20240410"
+#define FW_STRING3 "20240416"
 #define FW_REV FW_STRING1 FW_STRING2 FW_STRING3
 
 #define PIN_SDA 0
@@ -50,8 +59,8 @@
 // https://datasheets.maximintegrated.com/en/ds/MAX17320.pdf
 #define MAX_ADDR1 0x36
 #define MAX_ADDR2 0x0b
-// MP2762A charger
-// https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2762AGV/document_id/9073/
+// MP2650 charger
+// https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2650GV/document_id/9664/
 #define MPS_ADDR  0x5c
 
 #define I2C_TIMEOUT (1000*500)
@@ -285,8 +294,6 @@ void mps_write_buf(uint8_t addr, uint8_t size, const uint8_t *buf)
   i2c_write_blocking(i2c0, MPS_ADDR, txbuf, size + 1, false);
 }
 
-// https://git.clarahobbs.com/pd-buddy/pd-buddy-firmware/src/branch/master/lib/src/fusb302b.c
-
 uint8_t fusb_read_byte(uint8_t addr)
 {
   uint8_t buf;
@@ -356,7 +363,7 @@ uint8_t fusb_read_message(union pd_msg *msg)
    * Because of our configuration, we should be able to assume this means the
    * buffer is empty, and not try to read past a non-SOP message. */
   uint8_t rxb = fusb_read_byte(FUSB_FIFOS);
-  if (rxb!=0) printf("[rxb] %x\n", rxb);
+  if (rxb!=0) printf("# [fusb] rx = 0x%02x\n", rxb);
   if ((rxb & FUSB_FIFO_RX_TOKEN_BITS)
       != FUSB_FIFO_RX_SOP) {
     return 1;
@@ -376,60 +383,63 @@ uint8_t fusb_read_message(union pd_msg *msg)
 }
 
 // returns voltage
-int print_src_fixed_pdo(uint32_t pdo) {
+int print_src_fixed_pdo(int number, uint32_t pdo) {
   int tmp;
+  
+  printf("[pd_src_fixed_pdo]\n");
+  printf("number = %d\n", number);
 
   /* Dual-role power */
   tmp = (pdo & PD_PDO_SRC_FIXED_DUAL_ROLE_PWR) >> PD_PDO_SRC_FIXED_DUAL_ROLE_PWR_SHIFT;
   if (tmp) {
-    printf("\tdual_role_pwr: %d\n", tmp);
+    printf("dual_role_pwr = %d\n", tmp);
   }
 
   /* USB Suspend Supported */
   tmp = (pdo & PD_PDO_SRC_FIXED_USB_SUSPEND) >> PD_PDO_SRC_FIXED_USB_SUSPEND_SHIFT;
   if (tmp) {
-    printf("\tusb_suspend: %d\n", tmp);
+    printf("usb_suspend = %d\n", tmp);
   }
 
   /* Unconstrained Power */
   tmp = (pdo & PD_PDO_SRC_FIXED_UNCONSTRAINED) >> PD_PDO_SRC_FIXED_UNCONSTRAINED_SHIFT;
   if (tmp) {
-    printf("\tunconstrained_pwr: %d\n", tmp);
+    printf("unconstrained_pwr = %d\n", tmp);
   }
 
   /* USB Communications Capable */
   tmp = (pdo & PD_PDO_SRC_FIXED_USB_COMMS) >> PD_PDO_SRC_FIXED_USB_COMMS_SHIFT;
   if (tmp) {
-    printf("\tusb_comms: %d\n", tmp);
+    printf("usb_comms = %d\n", tmp);
   }
 
   /* Dual-Role Data */
   tmp = (pdo & PD_PDO_SRC_FIXED_DUAL_ROLE_DATA) >> PD_PDO_SRC_FIXED_DUAL_ROLE_DATA_SHIFT;
   if (tmp) {
-    printf("\tdual_role_data: %d\n", tmp);
+    printf("dual_role_data = %d\n", tmp);
   }
 
   /* Unchunked Extended Messages Supported */
   tmp = (pdo & PD_PDO_SRC_FIXED_UNCHUNKED_EXT_MSG) >> PD_PDO_SRC_FIXED_UNCHUNKED_EXT_MSG_SHIFT;
   if (tmp) {
-    printf("\tunchunked_ext_msg: %d\n", tmp);
+    printf("unchunked_ext_msg = %d\n", tmp);
   }
 
   /* Peak Current */
   tmp = (pdo & PD_PDO_SRC_FIXED_PEAK_CURRENT) >> PD_PDO_SRC_FIXED_PEAK_CURRENT_SHIFT;
   if (tmp) {
-    printf("\tpeak_i: %d\n", tmp);
+    printf("peak_i = %d\n", tmp);
   }
 
   /* Voltage */
   tmp = (pdo & PD_PDO_SRC_FIXED_VOLTAGE) >> PD_PDO_SRC_FIXED_VOLTAGE_SHIFT;
-  printf("\tv: %d.%02d V\n", PD_PDV_V(tmp), PD_PDV_CV(tmp));
+  printf("v = %d.%02d\n", PD_PDV_V(tmp), PD_PDV_CV(tmp));
 
   int voltage = (int)PD_PDV_V(tmp);
 
   /* Maximum Current */
   tmp = (pdo & PD_PDO_SRC_FIXED_CURRENT) >> PD_PDO_SRC_FIXED_CURRENT_SHIFT;
-  printf("\ti: %d.%02d A\n", PD_PDI_A(tmp), PD_PDI_CA(tmp));
+  printf("i_a: %d.%02d\n", PD_PDI_A(tmp), PD_PDI_CA(tmp));
 
   return voltage;
 }
@@ -474,26 +484,25 @@ float charger_dump() {
   report_volts = adc_sys_v;
 
   if (print_pack_info) {
-    printf("[charger info]\n");
-    printf("  status: %x\n", status);
-    printf("  reported current: %f voltage: %f\n", report_current, report_volts);
-    printf("  fault: %x\n  ------------\n", fault);
+    printf("[charger_info]\n");
+    printf("status = 0x%x\n", status);
+    printf("fault = 0x%x\n", fault);
 
-    printf("  adc_bat_v: %f\n", adc_bat_v);
-    printf("  adc_sys_v: %f\n", adc_sys_v);
-    printf("  adc_charge_c: %f\n", adc_charge_c);
-    printf("  adc_input_v: %f\n", adc_input_v);
-    printf("  adc_input_c: %f\n", adc_input_c);
-    printf("  adc_temp: %f\n", adc_temp);
-    printf("  adc_sys_pwr: %f\n", adc_sys_pwr);
-    printf("  adc_discharge_c: %f\n", adc_discharge_c);
-    printf("  adc_ntc_v: %f\n  ------------\n", adc_ntc_v);
+    printf("adc_bat_v = %f\n", adc_bat_v);
+    printf("adc_sys_v = %f\n", adc_sys_v);
+    printf("adc_charge_c = %f\n", adc_charge_c);
+    printf("adc_input_v = %f\n", adc_input_v);
+    printf("adc_input_c = %f\n", adc_input_c);
+    printf("adc_temp = %f\n", adc_temp);
+    printf("adc_sys_pwr = %f\n", adc_sys_pwr);
+    printf("adc_discharge_c = %f\n", adc_discharge_c);
+    printf("adc_ntc_v = %f\n", adc_ntc_v);
 
-    printf("  input_c_limit: %x\n", input_c_limit);
-    printf("  input_v_limit: %x\n", input_v_limit);
-    printf("  charge_c: %x\n", charge_c);
-    printf("  precharge_c: %x\n", precharge_c);
-    printf("  bat_full_v: %d\n  ============\n", bat_full_v);
+    printf("input_c_limit = 0x%x\n", input_c_limit);
+    printf("input_v_limit = 0x%x\n", input_v_limit);
+    printf("charge_c = 0x%x\n", charge_c);
+    printf("precharge_c = 0x%x\n", precharge_c);
+    printf("bat_full_v = 0x%d\n", bat_full_v);
   }
 
   return adc_input_v;
@@ -506,10 +515,7 @@ void max_dump() {
   // set pack cfg: 2 cells (0), 1+1 thermistor, 6v charge pump, 11:thtype=10k, btpken on, no aoldo
   max_write_word_100(0xb5, (0<<14)|(1<<13)|(0<<11)|(0<<8)|(2<<2)|0);
 
-  // fixme set thermistor config
-  //max_write_word_100(0xca, 0x30fb); // for 100k, beta value 4250
-
-  // TODO: need to enable balancing (zener?)
+  // enable balancing (zener)
   // nBalCfg
   max_write_word(0x61, 0x0000);
   max_write_word(0x61, 0x0000);
@@ -555,107 +561,93 @@ void max_dump() {
   report_cells_v[1] = cell2;
 
   if (print_pack_info) {
-    printf("[pack info]\n");
-    printf("  comm_stat: %04x\n", comm_stat);
-    printf("  packcfg: %04x\n", packcfg);
-    printf("  status: %04x\n", status);
-    if (status & 0x8000) {
-      printf("  `-- prot alert\n");
+    printf("[pack_info]\n");
+    printf("comm_stat = 0x%04x\n", comm_stat);
+    printf("packcfg = 0x%04x\n", packcfg);
+    printf("status = 0x%04x\n", status);
+    printf("status_prot_alert = %d\n", (status & 0x8000) ? 1 : 0);
+    printf("prot_alert = 0x%04x\n", prot_alert);
+    printf("prot_cfg2 = 0x%04x\n", prot_cfg2);
+    printf("therm_cfg = 0x%04x\n", therm_cfg);
+    printf("temp = %f\n", temp);
+    printf("die temp = %f\n", die_temp);
+    printf("temp1 = %f\n", temp1);
+    printf("temp2 = %f\n", temp2);
+    printf("temp3 = %f\n", temp3);
+    printf("temp4 = %f\n", temp4);
+    
+    printf("prot_status = 0x%04x\n", prot_status);
+
+    printf("prot_status_meaning = \"");
+    if (prot_status & (1<<14)) {
+      printf("too hot, ");
     }
+    if (prot_status & (1<<13)) {
+      printf("full, ");
+    }
+    if (prot_status & (1<<12)) {
+      printf("too cold for charge, ");
+    }
+    if (prot_status & (1<<11)) {
+      printf("overvoltage, ");
+    }
+    if (prot_status & (1<<10)) {
+      printf("overcharge current, ");
+    }
+    if (prot_status & (1<<9)) {
+      printf("qoverflow, ");
+    }
+    if (prot_status & (1<<8)) {
+      printf("prequal timeout, ");
+    }
+    if (prot_status & (1<<7)) {
+      printf("imbalance, ");
+    }
+    if (prot_status & (1<<6)) {
+      printf("perm fail, ");
+    }
+    if (prot_status & (1<<5)) {
+      printf("die hot, ");
+    }
+    if (prot_status & (1<<4)) {
+      printf("too hot for discharge, ");
+    }
+    if (prot_status & (1<<3)) {
+      printf("undervoltage, ");
+    }
+    if (prot_status & (1<<2)) {
+      printf("overdischarge current, ");
+    }
+    if (prot_status & (1<<1)) {
+      printf("resdfault, ");
+    }
+    if (prot_status & (1<<0)) {
+      printf("ship, ");
+    }
+    printf("\"\n");
+
+    printf("vcell = %f\n", vcell);
+    printf("avg_vcell = %f\n", avg_vcell);
+    printf("cell1 = %f\n", cell1);
+    printf("cell2 = %f\n", cell2);
+    printf("cell3 = %f\n", cell3);
+    printf("cell4 = %f\n", cell4);
+    printf("vpack = %f\n", vpack);
+
+    printf("rep_capacity_mah = %f\n", rep_capacity);
+    printf("rep_percentage = %f\n", rep_percentage);
+    printf("rep_age_percentage = %f\n", rep_age);
+    printf("rep_full_capacity_mah = %f\n", rep_full_capacity);
+    printf("rep_time_to_empty_sec = %f\n", rep_time_to_empty);
+    printf("rep_time_to_full_sec = %f\n", rep_time_to_full);
   }
+    
   if (status & 0x0002) {
-    printf("  `-- POR, clearing\n");
+    printf("# POR, clearing status\n");
     max_write_word(0x61, 0x0000);
     max_write_word(0x61, 0x0000);
     max_write_word(0x00, status & (~0x0002));
   }
-  if (print_pack_info) {
-    printf("  prot_alert: %04x\n", prot_alert);
-    printf("  prot_cfg2: %04x\n", prot_cfg2);
-    printf("  therm_cfg: %04x\n", therm_cfg);
-    printf("  temp: %f\n", temp);
-    printf("  die temp: %f\n", die_temp);
-    printf("  temp1: %f\n", temp1);
-    printf("  temp2: %f\n", temp2);
-    printf("  temp3: %f\n", temp3);
-    printf("  temp4: %f\n", temp4);
-
-    printf("  prot_status: %04x\n", prot_status);
-    if (prot_status & (1<<14)) {
-      printf("  `-- too hot\n");
-    }
-    if (prot_status & (1<<13)) {
-      printf("  `-- full\n");
-    }
-    if (prot_status & (1<<12)) {
-      printf("  `-- too cold for charge\n");
-    }
-    if (prot_status & (1<<11)) {
-      printf("  `-- overvoltage\n");
-    }
-    if (prot_status & (1<<10)) {
-      printf("  `-- overcharge current\n");
-    }
-    if (prot_status & (1<<9)) {
-      printf("  `-- qoverflow\n");
-    }
-    if (prot_status & (1<<8)) {
-      printf("  `-- prequal timeout\n");
-    }
-    if (prot_status & (1<<7)) {
-      printf("  `-- imbalance\n");
-    }
-    if (prot_status & (1<<6)) {
-      printf("  `-- perm fail\n");
-    }
-    if (prot_status & (1<<5)) {
-      printf("  `-- die hot\n");
-    }
-    if (prot_status & (1<<4)) {
-      printf("  `-- too hot for discharge\n");
-    }
-    if (prot_status & (1<<3)) {
-      printf("  `-- undervoltage\n");
-    }
-    if (prot_status & (1<<2)) {
-      printf("  `-- overdischarge current\n");
-    }
-    if (prot_status & (1<<1)) {
-      printf("  `-- resdfault\n");
-    }
-    if (prot_status & (1<<0)) {
-      printf("  `-- ship\n");
-    }
-
-    printf("  vcell: %f\n", vcell);
-    printf("  avg_vcell: %f\n", avg_vcell);
-    printf("  cell1: %f\n", cell1);
-    printf("  cell2: %f\n", cell2);
-    printf("  cell3: %f\n", cell3);
-    printf("  cell4: %f\n", cell4);
-    printf("  vpack: %f\n", vpack);
-
-    printf("  rep_capacity: %f mAh\n", rep_capacity);
-    printf("  rep_percentage: %f %\n", rep_percentage);
-    printf("  rep_age: %f %\n", rep_age);
-    printf("  rep_full_capacity: %f mAh\n", rep_full_capacity);
-    printf("  rep_time_to_empty: %f s\n", rep_time_to_empty);
-    printf("  rep_time_to_full: %f s\n", rep_time_to_full);
-    printf("  ============\n");
-  }
-
-  char report[128];
-  sprintf(report, "%04d %05d %05d %06d %06d\r\n",
-          (int)(rep_percentage*10.0),
-          (int)(rep_capacity),
-          (int)(rep_full_capacity),
-          (int)(rep_time_to_empty),
-          (int)(rep_time_to_full));
-
-  uart_puts(UART_ID, report);
-
-  //printf("  report: %s", report);
-  //printf("  ============\n");
 }
 
 void turn_som_power_on() {
@@ -664,13 +656,12 @@ void turn_som_power_on() {
 
   gpio_put(PIN_LED_B, 1);
 
-  printf("[turn_som_power_on]\n");
+  printf("# [action] turn_som_power_on\n");
   gpio_put(PIN_1V1_ENABLE, 1);
   sleep_ms(10);
   gpio_put(PIN_3V3_ENABLE, 1);
   sleep_ms(10);
 
-  // FIXME spi test
   gpio_put(PIN_SOM_MOSI, 1);
   gpio_put(PIN_SOM_SS0, 1);
   gpio_put(PIN_SOM_SCK, 1);
@@ -710,7 +701,7 @@ void turn_som_power_off() {
 
   gpio_put(PIN_LED_B, 0);
 
-  printf("[turn_som_power_off]\n");
+  printf("# [action] turn_som_power_off\n");
   gpio_put(PIN_DISP_RESET, 0);
   gpio_put(PIN_DISP_EN, 0);
 
@@ -754,8 +745,6 @@ char uart_buffer[255] = {0};
 
 // chr: input character
 void handle_commands(char chr) {
-  printf("rx: [%c]\n", chr);
-
   if (cmd_echo) {
     sprintf(uart_buffer, "%c", chr);
     uart_puts(UART_ID, uart_buffer);
@@ -894,8 +883,6 @@ void handle_commands(char chr) {
                 report_capacity_percentage,
                 som_is_powered?1:0);
 
-        printf("[gauge] [%s]\n", uart_buffer);
-
         uart_puts(UART_ID, uart_buffer);
       }
       else if (remote_cmd == 'S') {
@@ -944,7 +931,7 @@ void init_spi_client() {
   spi_set_slave(spi1, true);
   spi_set_format(spi1, 8, SPI_CPOL_0, SPI_CPHA_1, SPI_MSB_FIRST);
 
-  printf("[init_spi_client] done.\n");
+  printf("# [spi] init_spi_client done\n");
 }
 
 /**
@@ -957,7 +944,7 @@ void handle_spi_commands() {
   int all_zeroes = 1;
 
   while (spi_is_readable(spi1) && len < SPI_BUF_LEN) {
-    // 0x00 is some "repeated tx data"
+    // 0x00 is "repeated tx data"
     spi_read_blocking(spi1, 0x00, &spi_buf[len], 1);
     if (spi_buf[len] != 0) all_zeroes = 0;
     len++;
@@ -967,7 +954,7 @@ void handle_spi_commands() {
     return;
   }
 
-  printf("[spi] rx len: %d, %02x %02x %02x %02x %02x %02x %02x %02x\n", len, spi_buf[0], spi_buf[1], spi_buf[2], spi_buf[3], spi_buf[4], spi_buf[5], spi_buf[6], spi_buf[7]);
+  //printf("# [spi] rx (len = %d): %02x %02x %02x %02x %02x %02x %02x %02x\n", len, spi_buf[0], spi_buf[1], spi_buf[2], spi_buf[3], spi_buf[4], spi_buf[5], spi_buf[6], spi_buf[7]);
 
   // states:
   // 0   arg1 byte expected
@@ -978,7 +965,7 @@ void handle_spi_commands() {
     if (spi_cmd_state == ST_EXPECT_MAGIC) {
       // magic byte found, prevents garbage data
       // in the bus from triggering a command
-      if (spi_buf[s] == 0xB5) {
+      if (spi_buf[s] == 0xb5) {
         spi_cmd_state = ST_EXPECT_CMD;
       }
     }
@@ -992,6 +979,7 @@ void handle_spi_commands() {
       spi_arg1 = spi_buf[s];
       spi_cmd_state = ST_EXPECT_RETURN;
     }
+    //printf("# [spi] after 0x%02x (pos %d): state %d cmd %c (%02x) arg %d\n", spi_buf[s], s, spi_cmd_state, spi_command, spi_command, spi_arg1);
   }
 
   if (spi_cmd_state == ST_EXPECT_MAGIC && !all_zeroes) {
@@ -1000,8 +988,11 @@ void handle_spi_commands() {
     // software spi from BPI-CM4 where we get
     // bit-shifted bytes
 
-    // FIXME
     init_spi_client();
+    spi_cmd_state = ST_EXPECT_MAGIC;
+    spi_command = 0;
+    spi_arg1 = 0;
+    return;
   }
 
   if (spi_cmd_state != ST_EXPECT_RETURN) {
@@ -1009,7 +1000,7 @@ void handle_spi_commands() {
     return;
   }
 
-  printf("[spi] exec:%c,%02x\r\n", spi_command, spi_arg1);
+  printf("# [spi] exec: '%c' 0x%02x\n", spi_command, spi_arg1);
 
   // clear receive buffer, reuse as send buffer
   memset(spi_buf, 0, SPI_BUF_LEN);
@@ -1098,12 +1089,6 @@ void handle_spi_commands() {
 
   spi_write_blocking(spi1, spi_buf, SPI_BUF_LEN);
 
-  // clear any pending reads
-  /*while (spi_is_readable(spi1)) {
-    printf("[spi] clearing rx...\n");
-    spi_read_blocking(spi1, 0x00, &spi_buf[0], 1);
-  }*/
-
   spi_cmd_state = ST_EXPECT_MAGIC;
   spi_command = 0;
   spi_arg1 = 0;
@@ -1131,9 +1116,6 @@ int main() {
   gpio_set_function(PIN_KBD_UART_TX, GPIO_FUNC_UART);
   gpio_set_function(PIN_KBD_UART_RX, GPIO_FUNC_UART);
   int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
-  //irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
-  //irq_set_enabled(UART_IRQ, true);
-  //uart_set_irq_enables(UART_ID, true, false); // bool rx_has_data, bool tx_needs_data
 
   // UART to som
   uart_init(uart0, BAUD_RATE);
@@ -1193,33 +1175,13 @@ int main() {
   gpio_put(PIN_LED_G, 0);
   gpio_put(PIN_LED_B, 0);
 
-  // TODO: actual SPI bus
-  /*gpio_init(PIN_SOM_MOSI);
-  gpio_init(PIN_SOM_SS0);
-  gpio_init(PIN_SOM_SCK);
-  gpio_init(PIN_SOM_MISO);
-  gpio_set_dir(PIN_SOM_MOSI, 1);
-  gpio_set_dir(PIN_SOM_SS0, 1);
-  gpio_set_dir(PIN_SOM_SCK, 1);
-  gpio_set_dir(PIN_SOM_MISO, 1);
-  gpio_put(PIN_SOM_MOSI, 0);
-  gpio_put(PIN_SOM_SS0, 0);
-  gpio_put(PIN_SOM_SCK, 0);
-  gpio_put(PIN_SOM_MISO, 0);*/
-  //gpio_set_pulls(PIN_SOM_MOSI, 0, 0);
-  //gpio_set_pulls(PIN_SOM_MISO, 0, 0);
-  //gpio_set_pulls(PIN_SOM_SS0, 0, 0);
-  //gpio_set_pulls(PIN_SOM_SCK, 0, 0);
-
   gpio_init(PIN_USB_SRC_ENABLE);
   gpio_set_dir(PIN_USB_SRC_ENABLE, 1);
   gpio_put(PIN_USB_SRC_ENABLE, 0);
 
-  turn_som_power_on();
-
   // latch the PWR and display pins
-  //gpio_put(PIN_PWREN_LATCH, 1);
-  //gpio_put(PIN_PWREN_LATCH, 0);
+  gpio_put(PIN_PWREN_LATCH, 1);
+  gpio_put(PIN_PWREN_LATCH, 0);
 
   unsigned int t = 0;
   unsigned int t_report = 0;
@@ -1233,12 +1195,11 @@ int main() {
   union pd_msg rx_msg;
 
   int power_objects = 0;
-
-  // https://www.reclaimerlabs.com/blog/2017/2/1/usb-c-for-engineers-part-3
+  int max_voltage = 0;
 
   sleep_ms(5000);
 
-  printf("[pocket-sysctl] entering main loop.\n");
+  printf("# [pocket_sysctl] entering main loop.\n");
 
   while (true) {
     // handle commands from keyboard
@@ -1251,7 +1212,7 @@ int main() {
     // handle commands over usb serial
     int usb_c = getchar_timeout_us(0);
     if (usb_c != PICO_ERROR_TIMEOUT) {
-      printf("[acm command] '%x'\n", usb_c);
+      printf("# [acm_command] '%c'\n", usb_c);
       if (usb_c == '1') {
         turn_som_power_on();
       }
@@ -1269,16 +1230,16 @@ int main() {
       request_sent = 0;
 
       // by default, we output 5V on VUSB
-      gpio_put(PIN_USB_SRC_ENABLE, 1); // FIXME
+      gpio_put(PIN_USB_SRC_ENABLE, 1);
 
-      //printf("[pocket-sysctl] state 0\n");
+      //printf("# [pd] state 0\n");
       // probe FUSB302BMPX
       if (i2c_read_timeout_us(i2c0, FUSB_ADDR, rxdata, 1, false, I2C_TIMEOUT)) {
         // 1. set auto GoodCRC
         // AUTO_CRC in Switches1
         // Address: 03h; Reset Value: 0b0010_0000
 
-        printf("[pocket-sysctl] FUSB probed.\n");
+        //printf("# [pd] FUSB probed.\n");
 
         fusb_write_byte(FUSB_RESET, FUSB_RESET_SW_RES);
 
@@ -1300,16 +1261,14 @@ int main() {
         sleep_us(250);
         uint8_t cc1 = fusb_read_byte(FUSB_STATUS0) & FUSB_STATUS0_BC_LVL;
 
-        printf("[pocket-sysctl] CC1: %d\n", cc1);
+        //printf("# [pd] CC1: %d\n", cc1);
 
         /* Measure CC2 */
         fusb_write_byte(FUSB_SWITCHES0, 8|2|1); //  MEAS_CC2|PDWN2   |PDWN1
         sleep_us(250);
         uint8_t cc2 = fusb_read_byte(FUSB_STATUS0) & FUSB_STATUS0_BC_LVL;
 
-        printf("[pocket-sysctl] CC2: %d\n", cc2);
-
-        // cc1: 0, cc2: 3
+        //printf("# [pd] CC2: %d\n", cc2);
 
         // detect orientation
         if (cc1 > cc2) {
@@ -1320,23 +1279,23 @@ int main() {
           fusb_write_byte(FUSB_SWITCHES0,  8|2|1); //  MEAS_CC2|PDWN2   |PDWN1
         }
 
-        printf("[pocket-sysctl] switches set\n");
+        //printf("# [pd] switches set.\n");
 
         fusb_write_byte(FUSB_RESET, FUSB_RESET_PD_RESET);
 
         // automatic soft reset
-        // FIXME
+        // FIXME disturbs PD with some supplies
         //fusb_write_byte(FUSB_CONTROL3, (1<<6) | (1<<4) | (1<<3) | (3<<1) | 1);
         //sleep_ms(1);
         //fusb_write_byte(FUSB_CONTROL3, (1<<4) | (1<<3) | (3<<1) | 1);
 
-        printf("[pocket-sysctl] auto hard/soft reset and retries set.\n");
+        //printf("# [pd] auto hard/soft reset and retries set.\n");
 
         t = 0;
         state = 1;
       } else {
         if (t > 1000) {
-          printf("[pocket-sysctl] state 0: fusb timeout\n");
+          printf("# [pd] state 0: fusb timeout.\n");
           t = 0;
         }
       }
@@ -1345,7 +1304,7 @@ int main() {
       //printf("[pocket-sysctl] state 1\n");
 
       if (t>3000) {
-        printf("[pocket-sysctl] state 1, timeout\n");
+        printf("# [pd] state 1, timeout.\n");
         float input_voltage = charger_dump();
         max_dump();
         t = 0;
@@ -1365,25 +1324,25 @@ int main() {
       int res = fusb_read_message(&rx_msg);
 
       if (!res) {
-        //printf("[pocket-sysctl] s1: charger responds, turning off USB_SRC\n");
+        //printf("# [pd] s1: charger responds, turning off USB_SRC\n");
         // if a charger is responding, turn off our 5V output
         gpio_put(PIN_USB_SRC_ENABLE, 0);
 
         uint8_t msgtype = PD_MSGTYPE_GET(&rx_msg);
         uint8_t numobj = PD_NUMOBJ_GET(&rx_msg);
         if (msgtype == PD_MSGTYPE_SOURCE_CAPABILITIES) {
-          int max_voltage = 0;
+          max_voltage = 0;
           for (int i=0; i<numobj; i++) {
             uint32_t pdo = rx_msg.obj[i];
 
             if ((pdo & PD_PDO_TYPE) == PD_PDO_TYPE_FIXED) {
-              int voltage = print_src_fixed_pdo(pdo);
+              int voltage = print_src_fixed_pdo(i+1, pdo);
               if (voltage > max_voltage && voltage <= 20) {
                 power_objects = i+1;
                 max_voltage = voltage;
               }
             } else {
-              printf("[pocket-sysctl] s1: not a fixed PDO: %08x\n", pdo);
+              printf("# [pd] state 1, not a fixed PDO: 0x%08x\n", pdo);
             }
           }
           if (!request_sent) {
@@ -1392,19 +1351,19 @@ int main() {
           }
         } else if (msgtype == PD_MSGTYPE_PS_RDY) {
           // power supply is ready
-          printf("[pocket-sysctl] s1: power supply ready!\n");
+          printf("# [pd] state 1, power supply ready.\n");
           request_sent = 0;
           t = 0;
           state = 3;
         } else {
-          printf("[pocket-sysctl] s1: msg type: %x numobj: %d\n", msgtype, numobj);
+          printf("# [pd] state 1, msg type: 0x%x numobj: %d\n", msgtype, numobj);
         }
       } else {
         //sleep_ms(1);
-        //printf("[pocket-sysctl] s1: no message\n");
+        //printf("# [pd] state 1, no message\n");
       }
     } else if (state == 2) {
-      printf("[pocket-sysctl] state 2, requesting PO %d\n", power_objects);
+      printf("# [pd] state 2, requesting PO %d, %d V\n", power_objects, max_voltage);
 
       tx.hdr = PD_MSGTYPE_REQUEST | PD_NUMOBJ(1) | PD_DATAROLE_UFP | PD_POWERROLE_SINK | PD_SPECREV_2_0;
 
@@ -1419,7 +1378,7 @@ int main() {
 
       fusb_send_message(&tx);
 
-      printf("[pocket-sysctl] s2: request sent.\n");
+      printf("# [pd] state 2, request sent.\n");
 
       tx_id_count++;
 
@@ -1437,14 +1396,13 @@ int main() {
 
       // running
       if (t>2000) {
-        printf("[pocket-sysctl] state 3\n");
-        //i2c_scan();
+        printf("# [pd] state 3.\n");
 
         float input_voltage = charger_dump();
         max_dump();
 
         if (input_voltage < 6) {
-          printf("[pocket-sysctl] input voltage below 6v, renegotiate\n");
+          printf("# [pd] input voltage below 6v, renegotiate.\n");
           state = 0;
         }
 

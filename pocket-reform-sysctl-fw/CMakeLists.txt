@@ -17,7 +17,7 @@ add_executable(sysctl
 	sysctl.c
 )
 
-target_link_libraries(sysctl pico_stdlib hardware_i2c hardware_rtc hardware_sleep)
+target_link_libraries(sysctl pico_stdlib hardware_i2c hardware_spi hardware_rtc hardware_sleep)
 
 pico_enable_stdio_usb(sysctl 1)
 pico_enable_stdio_uart(sysctl 0)
