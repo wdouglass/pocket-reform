@@ -30,7 +30,7 @@ target_include_directories(${PROJECT} PUBLIC
 # See the corresponding function in hw/bsp/FAMILY/family.cmake for details.
 family_configure_device_example(${PROJECT} noos)
 
-target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c hardware_pio)
+target_link_libraries(${PROJECT} PRIVATE pico_stdlib pico_multicore tinyusb_device tinyusb_board hardware_pwm hardware_i2c hardware_pio hardware_watchdog)
 
 target_compile_definitions(${PROJECT} PUBLIC PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
 

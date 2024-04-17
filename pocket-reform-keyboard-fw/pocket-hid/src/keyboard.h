@@ -1,15 +1,16 @@
 /*
-  MNT Reform 2.0 Keyboard Firmware
-  See keyboard.c for Copyright
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
+  Copyright 2021-2024 MNT Research GmbH (mntre.com)
 */
 
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-#define PREF_HID_FW_REV "PREFHID20240412"
+#define PREF_HID_FW_REV "PREFHID20240416"
 
 void reset_keyboard_state(void);
+int get_usb_power_state(void);
 
 void led_set(uint32_t rgb);
 void led_task(uint32_t rgb);

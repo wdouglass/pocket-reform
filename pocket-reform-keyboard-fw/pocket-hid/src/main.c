@@ -1,7 +1,10 @@
 /*
-  SPDX-License-Identifier: MIT
-  Copyright (c) 2019 Ha Thach (tinyusb.org)
-  Copyright (c) 2021-2024 MNT Research GmbH (mntre.com)
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
+  Copyright 2021-2024 MNT Research GmbH (mntre.com)
+
+  TinyUSB callbacks/code based on code 
+  Copyright 2019 Ha Thach (tinyusb.org)
 */
 
 #include <stdlib.h>
@@ -78,7 +81,9 @@ int process_keyboard(uint8_t* resulting_scancodes);
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
 
-/*------------- MAIN -------------*/
+// can be used as a global clock, incrementing around every ~10ms
+static int hid_task_counter = 0;
+
 int main(void)
 {
   board_init();
@@ -184,14 +189,22 @@ int main(void)
 // Device callbacks
 //--------------------------------------------------------------------+
 
+static int usb_power_state = 0;
+
 // Invoked when device is mounted
 void tud_mount_cb(void)
 {
+  usb_power_state = 1;
 }
 
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
+  usb_power_state = 0;
+}
+
+int get_usb_power_state(void) {
+  return usb_power_state;
 }
 
 // Invoked when usb bus is suspended
@@ -199,12 +212,14 @@ void tud_umount_cb(void)
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 void tud_suspend_cb(bool remote_wakeup_en)
 {
+  usb_power_state = 0;
   (void) remote_wakeup_en;
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
+  usb_power_state = 1;
 }
 
 // RGB LEDS
@@ -250,28 +265,22 @@ bool tud_hid_trackball_report(uint8_t report_id,
 uint8_t matrix_debounce[KBD_COLS*KBD_ROWS];
 uint8_t matrix_state[KBD_COLS*KBD_ROWS];
 
-int active_meta_mode = 0;
-uint8_t last_meta_key = 0;
+int active_menu_mode = 0;
+uint8_t last_menu_key = 0;
+uint32_t hyper_enter_long_press_start_ms = 0;
 
 uint8_t* active_matrix = matrix;
 bool media_toggle = 0;
-bool fn_key = 0; // Am I holding FN?
-bool circle = 0; // Am I holding circle?
+bool hyper_key = 0; // Am I holding HYPER?
 
 // enter the menu
-void enter_meta_mode(void) {
-  active_meta_mode = 1;
+void enter_menu_mode(void) {
+  active_menu_mode = 1;
   reset_and_render_menu();
-  if (!remote_get_power_state()) {
-    led_set_brightness(10);
-  }
 }
 
-void exit_meta_mode(void) {
-  active_meta_mode = 0;
-  if (!remote_get_power_state()) {
-    led_set_brightness(0);
-  }
+void exit_menu_mode(void) {
+  active_menu_mode = 0;
 }
 
 void reset_keyboard_state(void) {
@@ -279,7 +288,7 @@ void reset_keyboard_state(void) {
     matrix_debounce[i] = 0;
     matrix_state[i] = 0;
   }
-  last_meta_key = 0;
+  last_menu_key = 0;
   reset_menu();
 }
 
@@ -356,38 +365,54 @@ int process_keyboard(uint8_t* resulting_scancodes) {
         total_pressed++;
 
         // hyper + enter? open OLED menu
-        if (keycode == KEY_ENTER && fn_key) {
-          if (!active_meta_mode && !last_meta_key) {
-            enter_meta_mode();
+        if (keycode == KEY_ENTER && hyper_key) {
+          if (!last_menu_key) {
+            if (!active_menu_mode) {
+              enter_menu_mode();
+            }
+            uint32_t now_ms = board_millis();
+            if (!now_ms) now_ms++;
+
+            if (!hyper_enter_long_press_start_ms) {
+              hyper_enter_long_press_start_ms = now_ms;
+              // edge case
+            }
+            if (now_ms - hyper_enter_long_press_start_ms > 1000) {
+              // turn on computer after 2 seconds of holding hyper + enter
+              execute_menu_function(KEY_1);
+              exit_menu_mode();
+              last_menu_key = KEY_1;
+              hyper_enter_long_press_start_ms = 0;
+            }
           }
         } else if (keycode == KEY_F12) {
           remote_wake_som();
         } else if (keycode == KEY_COMPOSE) {
-          fn_key = 1;
+          hyper_key = 1;
           active_matrix = matrix_fn;
         } else {
-          if (active_meta_mode) {
+          if (active_menu_mode) {
             // not holding the same key?
-            if (last_meta_key != keycode) {
-              // hyper/circle/menu functions
-              int stay_meta = execute_meta_function(keycode);
+            if (last_menu_key != keycode) {
+              // hyper/menu functions
+              int stay_menu = execute_menu_function(keycode);
               // don't repeat action while key is held down
-              last_meta_key = keycode;
+              last_menu_key = keycode;
 
-              // exit meta mode
-              if (!stay_meta) {
-                exit_meta_mode();
+              // exit menu mode
+              if (!stay_menu) {
+                exit_menu_mode();
               }
 
               // after wake-up from sleep mode, skip further keymap processing
-              if (stay_meta == 2) {
+              if (stay_menu == 2) {
                 reset_keyboard_state();
-                enter_meta_mode();
+                enter_menu_mode();
                 return 0;
               }
             }
-          } else if (!last_meta_key) {
-            // not meta mode, regular key: report keypress via USB
+          } else if (!last_menu_key) {
+            // not menu mode, regular key: report keypress via USB
             // 6 keys is the limit in the HID descriptor
             if (used_key_codes < MAX_SCANCODES && resulting_scancodes && y < 5) {
               resulting_scancodes[used_key_codes++] = keycode;
@@ -397,15 +422,26 @@ int process_keyboard(uint8_t* resulting_scancodes) {
       } else {
         // key not pressed
         if (keycode == KEY_COMPOSE) {
-          fn_key = 0;
+          hyper_key = 0;
           active_matrix = matrix;
+          hyper_enter_long_press_start_ms = 0;
+        } else if (keycode == KEY_ENTER) {
+          hyper_enter_long_press_start_ms = 0;
         }
       }
     }
   }
 
-  // if no more keys are held down, allow a new meta command
-  if (total_pressed<1) last_meta_key = 0;
+  // if no more keys are held down, allow a new menu command
+  if (total_pressed<1) last_menu_key = 0;
+
+  // if device is off and user is pressing random keys,
+  // show a hint for turning on the device
+  if (!get_usb_power_state() && !remote_get_power_state()) {
+    if (total_pressed>0 && !active_menu_mode && !hyper_key && !last_menu_key) {
+      execute_menu_function(KEY_H);
+    }
+  }
 
   return used_key_codes;
 }
@@ -445,7 +481,7 @@ static int poll_trackball()
     tb_nx = (int8_t)buf[0];
     tb_ny = (int8_t)buf[1];
 
-    // HACK hue/value wheel
+    // backlight hue/value wheel
     if (matrix_state[KBD_COLS*4+0]) {
       if (tb_ny) {
         // shift held? saturation
@@ -572,8 +608,6 @@ void led_bitmap(uint8_t row, const uint8_t* row_rgb) {
 }
 
 
-int hid_task_counter = 0;
-
 // Every 10ms, we will sent 1 report for each HID profile (keyboard, mouse etc ..)
 // tud_hid_report_complete_cb() is used to send the next report after previous one is complete
 void hid_task(void)
@@ -588,11 +622,15 @@ void hid_task(void)
   }
   start_ms += interval_ms;
 
+  if (tud_suspended()) {
+    usb_power_state = 0;
+  } else {
+    usb_power_state = 1;
+  }
+
   // allow trackball backlight control even if there's no USB yet
-  if (hid_task_counter%10 == 0) {
-    if (tud_suspended() && remote_get_power_state()) {
-      poll_trackball();
-    }
+  if (!usb_power_state && remote_get_power_state()) {
+    poll_trackball();
   }
 
   // Remote wakeup
@@ -609,6 +647,19 @@ void hid_task(void)
   hid_task_counter++;
   if (hid_task_counter%100 == 0) {
     refresh_menu_page();
+
+    // power state debugging
+    /*if (usb_power_state) {
+      gfx_poke_cstr(0,0,"[usb on]");
+    } else {
+      gfx_poke_cstr(0,0,"[usb off]");
+    }
+    if (remote_get_power_state()) {
+      gfx_poke_cstr(10,0,"[pwr on]");
+    } else {
+      gfx_poke_cstr(10,0,"[pwr off]");
+    }*/
+    gfx_flush();
   }
 }
 
@@ -618,61 +669,61 @@ int led_hue = 127;
 
 typedef struct RgbColor
 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
 } RgbColor;
 
 typedef struct HsvColor
 {
-    unsigned char h;
-    unsigned char s;
-    unsigned char v;
+  unsigned char h;
+  unsigned char s;
+  unsigned char v;
 } HsvColor;
 
 RgbColor HsvToRgb(HsvColor hsv)
 {
-    RgbColor rgb;
-    unsigned char region, remainder, p, q, t;
+  RgbColor rgb;
+  unsigned char region, remainder, p, q, t;
 
-    if (hsv.s == 0)
+  if (hsv.s == 0)
     {
-        rgb.r = hsv.v;
-        rgb.g = hsv.v;
-        rgb.b = hsv.v;
-        return rgb;
+      rgb.r = hsv.v;
+      rgb.g = hsv.v;
+      rgb.b = hsv.v;
+      return rgb;
     }
 
-    region = hsv.h / 43;
-    remainder = (unsigned char)((hsv.h - (region * 43)) * 6);
+  region = hsv.h / 43;
+  remainder = (unsigned char)((hsv.h - (region * 43)) * 6);
 
-    p = (unsigned char)((hsv.v * (255 - hsv.s)) >> 8);
-    q = (unsigned char)((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
-    t = (unsigned char)((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
+  p = (unsigned char)((hsv.v * (255 - hsv.s)) >> 8);
+  q = (unsigned char)((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
+  t = (unsigned char)((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
 
-    switch (region)
+  switch (region)
     {
-        case 0:
-            rgb.r = hsv.v; rgb.g = t; rgb.b = p;
-            break;
-        case 1:
-            rgb.r = q; rgb.g = hsv.v; rgb.b = p;
-            break;
-        case 2:
-            rgb.r = p; rgb.g = hsv.v; rgb.b = t;
-            break;
-        case 3:
-            rgb.r = p; rgb.g = q; rgb.b = hsv.v;
-            break;
-        case 4:
-            rgb.r = t; rgb.g = p; rgb.b = hsv.v;
-            break;
-        default:
-            rgb.r = hsv.v; rgb.g = p; rgb.b = q;
-            break;
+    case 0:
+      rgb.r = hsv.v; rgb.g = t; rgb.b = p;
+      break;
+    case 1:
+      rgb.r = q; rgb.g = hsv.v; rgb.b = p;
+      break;
+    case 2:
+      rgb.r = p; rgb.g = hsv.v; rgb.b = t;
+      break;
+    case 3:
+      rgb.r = p; rgb.g = q; rgb.b = hsv.v;
+      break;
+    case 4:
+      rgb.r = t; rgb.g = p; rgb.b = hsv.v;
+      break;
+    default:
+      rgb.r = hsv.v; rgb.g = p; rgb.b = q;
+      break;
     }
 
-    return rgb;
+  return rgb;
 }
 
 void led_set(uint32_t rgb) {
@@ -775,29 +826,18 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
   (void) instance;
   (void) buffer;
 
-  //char repinfo[64];
-
-  //sprintf(repinfo, "Rep: %d/%d   ", report_type, report_id);
-  //gfx_poke_str(1, 1, repinfo);
-  //sprintf(repinfo, "Len: %d   ", bufsize);
-  //gfx_poke_str(1, 2, repinfo);
-  /*if (buffer) {
-    sprintf(repinfo, "%02x %02x %02x %02x %02x %02x", buffer[0], buffer[1], buffer[2],
-            buffer[3], buffer[4], buffer[5]);
-    gfx_poke_str(0, 0, repinfo);
-  }
-
-  gfx_flush();*/
-
-  //return;
-
   if (bufsize < 5) return;
 
-  // FIXME
   if (report_type == 2) {
     // Big Reform style
     if (report_id == 'x') {
       const char* cmd = (const char*)buffer;
+
+      // uncomment for debugging
+      /*char repinfo[64];
+      sprintf(repinfo, "cm: %c%c%c%c 4: %d sz: %d", cmd[0],cmd[1],cmd[2],cmd[3], cmd[4], bufsize);
+      gfx_poke_str(0, 0, repinfo);
+      gfx_flush();*/
 
       if (cmd == strnstr(cmd, CMD_TEXT_FRAME, 4)) {
         gfx_clear();
@@ -819,11 +859,9 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
         gfx_flush();
       }
       else if (cmd == strnstr(cmd, CMD_POWER_OFF, 4)) {
-        //reset_menu();
-        //anim_goodbye();
+        reset_menu();
         remote_turn_off_som();
-        //keyboard_power_off();
-        //reset_keyboard_state();
+        reset_keyboard_state();
       }
       else if (cmd == strnstr(cmd, CMD_OLED_CLEAR, 4)) {
         gfx_clear();
@@ -841,8 +879,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
         led_task(pixel_grb);
       }
       else if (cmd == strnstr(cmd, CMD_LOGO, 4)) {
-        // FIXME
-        //anim_hello();
+        anim_hello();
       }
       else if (cmd == strnstr(cmd, CMD_OLED_BRITE, 4)) {
         uint8_t val = (uint8_t)atoi((const char*)&buffer[4]);
@@ -875,3 +912,12 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_
     }
   }*/
 }
+
+// TODO
+// from https://github.com/raspberrypi/pico-sdk/issues/1118
+// Support for default BOOTSEL reset by changing baud rate
+/*void tud_cdc_line_coding_cb(__unused uint8_t itf, cdc_line_coding_t const* p_line_coding) {
+    if (p_line_coding->bit_rate == 110) {
+        reset_usb_boot(gpio_mask, 0);
+    }
+}*/

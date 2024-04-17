@@ -1,7 +1,7 @@
 /*
-  MNT Reform 2.0 Keyboard Firmware
-  See keyboard.c for Copyright
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
+  Copyright 2021-2024 MNT Research GmbH (mntre.com)
 */
 
 #include <stdlib.h>
@@ -48,26 +48,6 @@ void insert_bat_icon(char* str, int x, double v) {
   str[x+1] = 4*32+icon+1;
 }
 
-int remote_turn_on_som() {
-  uart_puts(UART_ID, "1p\r\n");
-  //led_set_brightness(10);
-  soc_power_on = 1;
-  return 1;
-}
-
-int remote_turn_off_som() {
-  uart_puts(UART_ID, "0p\r\n");
-  //led_set_brightness(0);
-  soc_power_on = 0;
-  return 1;
-}
-
-int remote_wake_som() {
-  uart_puts(UART_ID, "1w\r\n");
-  //anim_hello();
-  return 1;
-}
-
 int remote_get_power_state() {
   return soc_power_on;
 }
@@ -85,22 +65,6 @@ void remote_on_uart_rx() {
     uint8_t poke_chr = c;
 
     if (c == '\n') {
-      // TODO hack
-
-      /*if (uart_rx_i>6) {
-        gfx_clear();
-        //gfx_poke_str(0, 3, uart_rx_line);
-        // cut off after 4 digits
-        uart_rx_line[4] = 0;
-        float percentage = ((float)atoi(uart_rx_line))/(float)10.0;
-
-        char batinfo[32];
-        sprintf(batinfo, "   %.1f%%", (double)percentage);
-        insert_bat_icon(batinfo, 0, percentage);
-        gfx_poke_str(7, 1, batinfo);
-        gfx_flush();
-      }*/
-
       uart_rx_i = 0;
       poke_chr=' ';
     }
@@ -152,6 +116,8 @@ int remote_try_command(const char* cmd, int print_response) {
   if (print_response) {
     gfx_flush();
   };
+
+  uart_print_response = 0;
 
   return ok;
 }
@@ -239,4 +205,21 @@ int remote_get_voltages(void) {
   gfx_flush();
 
   return ok;
+}
+
+int remote_turn_on_som() {
+  remote_try_command("1p\r", 0);
+  soc_power_on = 1;
+  return 1;
+}
+
+int remote_turn_off_som() {
+  remote_try_command("0p\r", 0);
+  soc_power_on = 0;
+  return 1;
+}
+
+int remote_wake_som() {
+  remote_try_command("1w\r", 0);
+  return 1;
 }

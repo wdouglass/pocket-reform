@@ -1,7 +1,7 @@
 /*
-  MNT Reform 2.0 Keyboard Firmware
-  See keyboard.c for Copyright
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
+  Copyright 2021-2024 MNT Research GmbH (mntre.com)
 */
 
 #include "usb_hid_keys.h"
@@ -159,28 +159,3 @@ uint8_t matrix_fn[KBD_MATRIX_SZ] = {
   KEY_PAGEDOWN,
   KEY_END
 };
-
-// Second layer (toggled by HYPER+CIRCLE)
-/*uint8_t matrix_fn_toggled[KBD_MATRIX_SZ] = {
-  // Custom top row
-  KEY_ESCAPE,
-  KEY_F1,
-  KEY_F2,
-  KEY_F3,
-  KEY_F4,
-  KEY_F5,
-  KEY_F6,
-  HID_KEYBOARD_SC_MEDIA_BACKWARD,
-  HID_KEYBOARD_SC_MEDIA_PLAY,
-  HID_KEYBOARD_SC_MEDIA_FORWARD,
-  HID_KEYBOARD_SC_MEDIA_MUTE,
-  HID_KEYBOARD_SC_MEDIA_VOLUME_DOWN,
-  HID_KEYBOARD_SC_MEDIA_VOLUME_UP,
-  KEY_CIRCLE,
-
-  MATRIX_DEFAULT_ROW_2,
-  MATRIX_DEFAULT_ROW_3,
-  MATRIX_DEFAULT_ROW_4,
-  MATRIX_DEFAULT_ROW_5,
-  MATRIX_DEFAULT_ROW_6
-  };*/

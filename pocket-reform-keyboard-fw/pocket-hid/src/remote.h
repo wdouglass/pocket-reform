@@ -1,7 +1,7 @@
 /*
-  MNT Reform 2.0 Keyboard Firmware
-  See keyboard.c for Copyright
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: GPL-3.0-or-later
+  MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
+  Copyright 2021-2024 MNT Research GmbH (mntre.com)
 */
 
 #ifndef _REMOTE_H_
