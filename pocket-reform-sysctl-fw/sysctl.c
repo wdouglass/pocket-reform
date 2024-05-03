@@ -1197,6 +1197,12 @@ int main() {
 
   sleep_ms(5000);
 
+#ifdef FACTORY_MODE
+  // in factory mode, turn on power immediately to be able to flash
+  // the keyboard
+  turn_som_power_on();
+#endif
+
   printf("# [pocket_sysctl] entering main loop.\n");
 
   while (true) {
@@ -1207,6 +1213,7 @@ int main() {
 
     handle_spi_commands();
 
+#ifdef ACM_ENABLED
     // handle commands over usb serial
     int usb_c = getchar_timeout_us(0);
     if (usb_c != PICO_ERROR_TIMEOUT) {
@@ -1221,6 +1228,7 @@ int main() {
         print_pack_info = !print_pack_info;
       }
     }
+#endif
 
     if (state == 0) {
       gpio_put(PIN_LED_R, 0);
