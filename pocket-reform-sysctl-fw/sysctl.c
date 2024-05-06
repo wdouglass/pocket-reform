@@ -650,7 +650,11 @@ void max_dump() {
   }
 }
 
+void init_spi_client();
+
 void turn_som_power_on() {
+  init_spi_client();
+  
   // latch
   gpio_put(PIN_PWREN_LATCH, 1);
 
@@ -662,10 +666,10 @@ void turn_som_power_on() {
   gpio_put(PIN_3V3_ENABLE, 1);
   sleep_ms(10);
 
-  gpio_put(PIN_SOM_MOSI, 1);
+  /*gpio_put(PIN_SOM_MOSI, 1);
   gpio_put(PIN_SOM_SS0, 1);
   gpio_put(PIN_SOM_SCK, 1);
-  gpio_put(PIN_SOM_MISO, 1);
+  gpio_put(PIN_SOM_MISO, 1);*/
 
   gpio_put(PIN_5V_ENABLE, 1);
 
@@ -690,14 +694,16 @@ void turn_som_power_on() {
 }
 
 void turn_som_power_off() {
+  init_spi_client();
+  
   // latch
   gpio_put(PIN_PWREN_LATCH, 1);
 
   // FIXME spi test
-  gpio_put(PIN_SOM_MOSI, 0);
+  /*gpio_put(PIN_SOM_MOSI, 0);
   gpio_put(PIN_SOM_SS0, 0);
   gpio_put(PIN_SOM_SCK, 0);
-  gpio_put(PIN_SOM_MISO, 0);
+  gpio_put(PIN_SOM_MISO, 0);*/
 
   gpio_put(PIN_LED_B, 0);
 
@@ -1008,13 +1014,9 @@ void handle_spi_commands() {
     // toggle system power and/or reset imx
     if (spi_arg1 == 1) {
       turn_som_power_off();
-      init_spi_client();
-      return;
     }
     if (spi_arg1 == 2) {
       turn_som_power_on();
-      init_spi_client();
-      return;
     }
     if (spi_arg1 == 3) {
       // TODO
@@ -1085,8 +1087,10 @@ void handle_spi_commands() {
   // that we read above for unknown reasons
   init_spi_client();
 
-  spi_write_blocking(spi1, spi_buf, SPI_BUF_LEN);
-
+  if (som_is_powered) {
+    spi_write_blocking(spi1, spi_buf, SPI_BUF_LEN);
+  }
+  
   spi_cmd_state = ST_EXPECT_MAGIC;
   spi_command = 0;
   spi_arg1 = 0;
