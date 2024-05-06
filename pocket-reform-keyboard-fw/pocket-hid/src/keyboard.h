@@ -10,7 +10,6 @@
 #define PREF_HID_FW_REV "PREFHID20240416"
 
 void reset_keyboard_state(void);
-int get_usb_power_state(void);
 
 void led_set(uint32_t rgb);
 void led_task(uint32_t rgb);

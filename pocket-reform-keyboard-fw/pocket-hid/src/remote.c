@@ -134,7 +134,7 @@ int remote_get_status(void) {
   return ok;
 }
 
-int remote_get_voltages(void) {
+int remote_get_voltages(int quiet) {
   term_x = 0;
   term_y = 0;
 
@@ -180,6 +180,8 @@ int remote_get_voltages(void) {
     power_str = "Off";
     soc_power_on = 0;
   }
+
+  if (quiet) return ok;
 
   // plot
   gfx_clear();

@@ -70,7 +70,7 @@ void render_menu(int y) {
 // automatically refresh the current menu page if needed
 void refresh_menu_page() {
   if (current_menu_page == MENU_PAGE_BATTERY_STATUS) {
-    remote_get_voltages();
+    remote_get_voltages(0);
   } else if (current_menu_page == MENU_PAGE_MNT_LOGO && --logo_timeout_ticks <= 0) {
     reset_menu();
   }
@@ -129,7 +129,7 @@ int execute_menu_function(int keycode) {
   }
   else if (keycode == KEY_B) {
     current_menu_page = MENU_PAGE_BATTERY_STATUS;
-    remote_get_voltages();
+    remote_get_voltages(0);
     return 0;
   }
   else if (keycode == KEY_S) {

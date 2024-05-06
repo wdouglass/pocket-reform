@@ -69,7 +69,6 @@
 #define MAX_SCANCODES 6
 static uint8_t pressed_scancodes[MAX_SCANCODES] = {0,0,0,0,0,0};
 static int pressed_keys = 0;
-
 static volatile uint32_t led_value = 0;
 
 void hid_task(void);
@@ -189,22 +188,16 @@ int main(void)
 // Device callbacks
 //--------------------------------------------------------------------+
 
-static int usb_power_state = 0;
-
 // Invoked when device is mounted
 void tud_mount_cb(void)
 {
-  usb_power_state = 1;
+  // called
 }
 
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
-  usb_power_state = 0;
-}
-
-int get_usb_power_state(void) {
-  return usb_power_state;
+  // never called
 }
 
 // Invoked when usb bus is suspended
@@ -212,14 +205,14 @@ int get_usb_power_state(void) {
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 void tud_suspend_cb(bool remote_wakeup_en)
 {
-  usb_power_state = 0;
+  // never called
   (void) remote_wakeup_en;
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
-  usb_power_state = 1;
+  // never called
 }
 
 // RGB LEDS
@@ -437,7 +430,7 @@ int process_keyboard(uint8_t* resulting_scancodes) {
 
   // if device is off and user is pressing random keys,
   // show a hint for turning on the device
-  if (!get_usb_power_state() && !remote_get_power_state()) {
+  if (!remote_get_power_state()) {
     if (total_pressed>0 && !active_menu_mode && !hyper_key && !last_menu_key) {
       execute_menu_function(KEY_H);
     }
@@ -622,17 +615,6 @@ void hid_task(void)
   }
   start_ms += interval_ms;
 
-  if (tud_suspended()) {
-    usb_power_state = 0;
-  } else {
-    usb_power_state = 1;
-  }
-
-  // allow trackball backlight control even if there's no USB yet
-  if (!usb_power_state && remote_get_power_state()) {
-    poll_trackball();
-  }
-
   // Remote wakeup
   if (tud_suspended() && pressed_keys > 0)
   {
@@ -645,21 +627,20 @@ void hid_task(void)
   }
 
   hid_task_counter++;
+  if (hid_task_counter%1000 == 0) {
+    // quietly get voltages to update power state
+    remote_get_voltages(1);
+  }
   if (hid_task_counter%100 == 0) {
     refresh_menu_page();
 
     // power state debugging
-    /*if (usb_power_state) {
-      gfx_poke_cstr(0,0,"[usb on]");
+    /*if (remote_get_power_state()) {
+      gfx_poke_cstr(0,0,"[pwr on]");
     } else {
-      gfx_poke_cstr(0,0,"[usb off]");
+      gfx_poke_cstr(0,0,"[pwr off]");
     }
-    if (remote_get_power_state()) {
-      gfx_poke_cstr(10,0,"[pwr on]");
-    } else {
-      gfx_poke_cstr(10,0,"[pwr off]");
-    }*/
-    gfx_flush();
+    gfx_flush();*/
   }
 }
 

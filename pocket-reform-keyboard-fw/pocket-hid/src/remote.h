@@ -12,7 +12,7 @@ void empty_serial(void);
 int remote_receive_string(int print);
 int remote_try_wakeup(void);
 int remote_try_command(const char* cmd, int print_response);
-int remote_get_voltages(void);
+int remote_get_voltages(int quiet);
 int remote_check_for_low_battery(void);
 int remote_get_status(void);
 int remote_turn_on_som(void);
