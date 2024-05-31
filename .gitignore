@@ -1,0 +1,9 @@
+build
+*-bak
+*.kicad_prl
+*.zip
+picotool
+pico-sdk
+pico-extras
+tinyusb
+
