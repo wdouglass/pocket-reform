@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt install build-essential pkg-config libusb-1.0-0-dev cmake gcc-arm-none-eabi
+sudo apt install build-essential pkg-config libusb-1.0-0-dev cmake gcc-arm-none-eabi tio
 
 git clone --depth 1 https://github.com/raspberrypi/pico-sdk
 git clone --depth 1 https://github.com/raspberrypi/pico-extras
