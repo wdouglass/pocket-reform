@@ -3,7 +3,7 @@
   MNT Pocket Reform Keyboard/Trackball Controller Firmware for RP2040
   Copyright 2021-2024 MNT Research GmbH (mntre.com)
 
-  TinyUSB callbacks/code based on code 
+  TinyUSB callbacks/code based on code
   Copyright 2019 Ha Thach (tinyusb.org)
 */
 
@@ -454,9 +454,9 @@ int tb_btn4 = 0;
 // returns motion yes/no
 static int poll_trackball()
 {
-  tb_btn3 = matrix_state[KBD_COLS*5+3]>0;
-  tb_btn1 = matrix_state[KBD_COLS*5+4]>0;
-  tb_btn2 = matrix_state[KBD_COLS*5+7]>0;
+  tb_btn1 = matrix_state[KBD_COLS*5+3]>0;
+  tb_btn2 = matrix_state[KBD_COLS*5+4]>0;
+  tb_btn3 = matrix_state[KBD_COLS*5+7]>0;
   tb_btn4 = matrix_state[KBD_COLS*5+8]>0;
 
   uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
@@ -519,9 +519,19 @@ static void send_hid_report(uint8_t report_id)
         } else {
           tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*tb_nx, -2*tb_ny, 0, 0);
         }
-
       } else {
-        tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
+        if (tb_btn2 && tb_btn3) {
+          // enter sticky scroll mode
+          scroll_toggle = 1;
+        } else {
+          if (tb_btn1 && scroll_toggle) {
+            // exit sticky scroll mode
+            scroll_toggle = 0;
+          } else {
+            // actually report the buttons
+            tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 0, 0);
+          }
+        }
       }
 
       prev_buttons = buttons;
