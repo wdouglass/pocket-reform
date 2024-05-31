@@ -454,10 +454,10 @@ int tb_btn4 = 0;
 // returns motion yes/no
 static int poll_trackball()
 {
-  tb_btn1 = matrix_state[KBD_COLS*5+3]>0;
-  tb_btn2 = matrix_state[KBD_COLS*5+4]>0;
-  tb_btn3 = matrix_state[KBD_COLS*5+7]>0;
-  tb_btn4 = matrix_state[KBD_COLS*5+8]>0;
+  tb_btn1 = matrix_state[KBD_COLS*5+3]>0; // left
+  tb_btn4 = matrix_state[KBD_COLS*5+4]>0; // middle
+  tb_btn3 = matrix_state[KBD_COLS*5+7]>0; // scroll
+  tb_btn2 = matrix_state[KBD_COLS*5+8]>0; // right
 
   uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
 
