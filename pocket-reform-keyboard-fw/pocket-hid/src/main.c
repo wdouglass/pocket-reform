@@ -446,18 +446,23 @@ int prev_num_keys = 0;
 
 int8_t tb_nx = 0;
 int8_t tb_ny = 0;
-int tb_btn1 = 0;
-int tb_btn2 = 0;
-int tb_btn3 = 0;
-int tb_btn4 = 0;
+int tb_btn_left = 0;
+int tb_btn_right = 0;
+int tb_btn_scroll = 0;
+int tb_btn_middle = 0;
+// TODO: implement HID commands to update these
+int tb_btn_left_idx = KBD_COLS*5+4;
+int tb_btn_right_idx = KBD_COLS*5+8;
+int tb_btn_scroll_idx = KBD_COLS*5+7;
+int tb_btn_middle_idx = KBD_COLS*5+3;
 
 // returns motion yes/no
 static int poll_trackball()
 {
-  tb_btn1 = matrix_state[KBD_COLS*5+3]>0; // left
-  tb_btn4 = matrix_state[KBD_COLS*5+4]>0; // middle
-  tb_btn3 = matrix_state[KBD_COLS*5+7]>0; // scroll
-  tb_btn2 = matrix_state[KBD_COLS*5+8]>0; // right
+  tb_btn_left = matrix_state[tb_btn_left_idx]>0;
+  tb_btn_middle = matrix_state[tb_btn_middle_idx]>0;
+  tb_btn_right = matrix_state[tb_btn_right_idx]>0;
+  tb_btn_scroll = matrix_state[tb_btn_scroll_idx]>0;
 
   uint8_t buf[] = {0x7f, 0x00, 0x00, 0x00};
 
@@ -509,22 +514,22 @@ static void send_hid_report(uint8_t report_id)
 
     case REPORT_ID_MOUSE:
     {
-      int buttons = tb_btn1 | (tb_btn2<<1) | (tb_btn4<<2);
+      int buttons = tb_btn_left | (tb_btn_right<<1) | (tb_btn_middle<<2);
       int motion = poll_trackball();
 
       if (motion) {
         // no button, right + down, no scroll pan
-        if (tb_btn3 || scroll_toggle) {
+        if (tb_btn_scroll || scroll_toggle) {
           tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, 0, 0, 2*tb_ny, -2*tb_nx);
         } else {
           tud_hid_mouse_report(REPORT_ID_MOUSE, (uint8_t)buttons, -2*tb_nx, -2*tb_ny, 0, 0);
         }
       } else {
-        if (tb_btn2 && tb_btn3) {
+        if (tb_btn_middle && tb_btn_scroll) {
           // enter sticky scroll mode
           scroll_toggle = 1;
         } else {
-          if (tb_btn1 && scroll_toggle) {
+          if (tb_btn_middle && scroll_toggle) {
             // exit sticky scroll mode
             scroll_toggle = 0;
           } else {
