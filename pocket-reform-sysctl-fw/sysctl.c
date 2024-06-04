@@ -70,6 +70,7 @@
 #define DATA_BITS 8
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
+#define FACTORY_MODE 1
 
 // battery information
 // TODO: turn into a struct
