@@ -453,8 +453,8 @@ int tb_btn_middle = 0;
 // TODO: implement HID commands to update these
 int tb_btn_left_idx = KBD_COLS*5+4;
 int tb_btn_right_idx = KBD_COLS*5+8;
-int tb_btn_scroll_idx = KBD_COLS*5+7;
-int tb_btn_middle_idx = KBD_COLS*5+3;
+int tb_btn_scroll_idx = KBD_COLS*5+3;
+int tb_btn_middle_idx = KBD_COLS*5+7;
 
 // returns motion yes/no
 static int poll_trackball()
