@@ -63,7 +63,7 @@
   KEY_M,\
   KEY_COMMA,\
   KEY_DOT,\
-  KEY_UP,\
+  KEY_SLASH,\
   KEY_RIGHTALT
 
 // Sixth row
@@ -76,9 +76,9 @@
   KEY_SPACE,\
   KEY_SPACE,\
   KEY_MINUS,\
-  KEY_SLASH,\
   KEY_LEFT,\
   KEY_DOWN,\
+  KEY_UP,\
   KEY_RIGHT
 
 // Every line of `matrix` is a row of the keyboard, starting from the top.
