@@ -179,6 +179,9 @@ int main(void)
     pressed_keys = process_keyboard(pressed_scancodes);
     tud_task(); // tinyusb device task
     hid_task();
+    if (!remote_get_power_state()) {
+      sleep_ms(2);
+    }
   }
 
   return 0;
